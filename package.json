@@ -1,0 +1,48 @@
+{
+  "name": "apoyoalempleo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "deploy:pages": "wrangler pages deploy out",
+    "deploy:workers": "wrangler deploy",
+    "preview": "npm run build && wrangler pages dev out",
+    "prettier:write": "npx prettier --write '**/*.{js,ts}'",
+    "prettier:check": "npx prettier --check '**/*.{js,ts}'"
+  },
+  "dependencies": {
+    "@cloudflare/next-on-pages": "^1.13.14",
+    "@cloudflare/workers-types": "^4.20250821.0",
+    "axios": "^1.11.0",
+    "bcryptjs": "^3.0.2",
+    "date-fns": "^4.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "next": "15.5.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "wrangler": "^4.32.0",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.0",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "eslint-plugin-prettier": "5.0.0",
+    "prettier": "3.0.3"
+  },
+  "lint-staged": {
+    "**/*.{js,ts}": [
+      "prettier --write"
+    ]
+  },
+  "type": "module"
+}

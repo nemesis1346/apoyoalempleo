@@ -1,0 +1,5 @@
+# Remove trailing slashes for clean URLs  
+/*/ /:splat 301
+
+# SPA fallback - serve index.html for all non-asset requests
+/* /index.html 200

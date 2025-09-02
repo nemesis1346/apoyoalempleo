@@ -1,0 +1,46 @@
+name = "apoyoalempleo"
+main = "functions/_worker.js"
+compatibility_date = "2024-01-15"
+compatibility_flags = ["nodejs_compat"]
+
+# Default environment variables (for deployments without --env flag)
+[vars]
+ENVIRONMENT = "development"
+JWT_SECRET = "22a45534a5d97d30240989230c149cfa7723b52a3c1c140477b2ad8f8ca3af00413ed899e5d67ccd3824af242ed71aa009037843aa28a569bacedb2533c3fef2"
+R2_PUBLIC_URL = "https://pub-0aeb0ad84f014c5db8b244396ad8069f.r2.dev"
+
+# Environment variables
+[env.production.vars]
+ENVIRONMENT = "production"
+JWT_SECRET = "22a45534a5d97d30240989230c149cfa7723b52a3c1c140477b2ad8f8ca3af00413ed899e5d67ccd3824af242ed71aa009037843aa28a569bacedb2533c3fef2"
+R2_PUBLIC_URL = "https://pub-0aeb0ad84f014c5db8b244396ad8069f.r2.dev"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+JWT_SECRET = "22a45534a5d97d30240989230c149cfa7723b52a3c1c140477b2ad8f8ca3af00413ed899e5d67ccd3824af242ed71aa009037843aa28a569bacedb2533c3fef2"
+R2_PUBLIC_URL = "https://pub-0aeb0ad84f014c5db8b244396ad8069f.r2.dev"
+
+# D1 database for user data and application state
+[[d1_databases]]
+binding = "DB"
+database_name = "apoyoalempleo-db"
+database_id = "69fa7c19-0ef1-4ae8-931d-96c9187ef56a"
+
+# Keep KV namespaces since you already have them
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "b52a7c22941143d884fa393f87eaa1d1"
+preview_id = "70d382c2e9b24746867a9a89e426ae2a"
+
+[[kv_namespaces]]
+binding = "CONFIG"
+id = "18ad26694cb843e391e2408c66f606e3" 
+preview_id = "f2f59c8f58da450789aac8dee86f9db0"
+
+# R2 bucket for file storage
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "apoyoalempleo-storage"
+
+[observability.logs]
+enabled = false
