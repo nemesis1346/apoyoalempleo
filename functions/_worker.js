@@ -20,22 +20,16 @@ import { handleAuth } from "./api/auth.js";
 import { handleAdminRequest } from "./api/admin/index.js";
 import { handleCompaniesRequest } from "./api/companies/index.js";
 import { handleUploadRequest } from "./api/upload.js";
-import {
-  handleContactUnlockRequest,
-  handleContactStatusRequest,
-  handleUserUnlockedContactsRequest,
-} from "./api/contacts/unlock.js";
+import { handleContactsRequest } from "./api/contacts/index.js";
 
 // Utilities
 import { handleCORS, createResponse } from "./utils/cors.js";
 import { verifyJWT } from "./utils/jwt.js";
-import { CloudflareCache } from "./utils/cloudflare-cache.js";
 
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const path = url.pathname;
-    const cache = new CloudflareCache(env);
 
     // Handle CORS preflight requests
     if (request.method === "OPTIONS") {
@@ -55,7 +49,7 @@ export default {
           return response;
         }
 
-        // Admin routes (require authentication and admin role - not cacheable)
+        // Admin routes (require authentication and admin role - some are cacheable)
         if (path.startsWith("/api/admin")) {
           response = await handleAdminRequest(request, env);
 
@@ -75,44 +69,15 @@ export default {
           return createResponse({ error: "Unauthorized" }, 401);
         }
 
+        // Contacts routes (require authentication - some are cacheable)
+        if (path.startsWith("/api/contacts")) {
+          return await handleContactsRequest(request, env, authResult.payload);
+        }
+
         // Upload routes (require authentication - not cacheable)
         if (path.startsWith("/api/upload")) {
           return await handleUploadRequest(
             request.method,
-            request,
-            env,
-            authResult.payload,
-          );
-        }
-
-        // Contact unlock routes (require authentication - not cacheable)
-        if (
-          path.startsWith("/api/contacts/unlock") &&
-          request.method === "POST"
-        ) {
-          return await handleContactUnlockRequest(
-            request,
-            env,
-            authResult.payload,
-          );
-        }
-
-        if (
-          path.startsWith("/api/contacts/status") &&
-          request.method === "GET"
-        ) {
-          return await handleContactStatusRequest(
-            request,
-            env,
-            authResult.payload,
-          );
-        }
-
-        if (
-          path.startsWith("/api/contacts/unlocked") &&
-          request.method === "GET"
-        ) {
-          return await handleUserUnlockedContactsRequest(
             request,
             env,
             authResult.payload,

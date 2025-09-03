@@ -18,11 +18,11 @@ export default function ConditionalLayout({ children }) {
 
   // For all other pages, return the normal site layout
   return (
-    <>
+    <div className="overflow-y-auto h-screen">
       <Header />
       <Navigation />
       <main>{children}</main>
       <Footer />
-    </>
+    </div>
   );
 }

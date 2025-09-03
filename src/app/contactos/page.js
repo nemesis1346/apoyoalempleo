@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useLayoutEffect } from "react";
-import { adminService } from "../../services/adminService";
+import { contactsService } from "../../services/contactsService";
 import PageSkeleton from "../../components/contactos/PageSkeleton";
 import ContactsList from "../../components/contactos/ContactsList";
 import LoadMoreButton from "../../components/ui/LoadMoreButton";
@@ -37,7 +37,7 @@ export default function ContactsPage() {
           ...(city?.length > 0 && { filters: { city } }),
         };
 
-        const response = await adminService.contacts.getAll(params);
+        const response = await contactsService.getContacts(params);
 
         if (response.success) {
           const newContacts = response.data || [];

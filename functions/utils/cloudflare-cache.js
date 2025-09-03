@@ -51,7 +51,7 @@ export class CloudflareCache {
           existingHeaders[key] = value;
         }
 
-        // Create response with all headers preserved + ensure CORS
+        // Create response with all headers preserved
         const response = new Response(cached.body, {
           status: cached.status,
           statusText: cached.statusText,
@@ -60,12 +60,6 @@ export class CloudflareCache {
             "X-Cache-Status": "HIT",
             "X-Cache-Date":
               cached.headers.get("X-Cache-Date") || new Date().toISOString(),
-            // Ensure CORS headers are always present
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods":
-              "GET, POST, PUT, DELETE, OPTIONS, PATCH",
-            "Access-Control-Allow-Headers":
-              "Content-Type, Authorization, X-Requested-With, Accept, Origin",
           },
         });
 
@@ -102,12 +96,12 @@ export class CloudflareCache {
         existingHeaders[key] = value;
       }
 
-      // Clone response and add proper cache headers while ensuring CORS
+      // Clone response and add proper cache headers
       const cachedResponse = new Response(response.body, {
         status: response.status,
         statusText: response.statusText,
         headers: {
-          // Keep all existing headers
+          // Keep all existing headers (including CORS from createResponse)
           ...existingHeaders,
           // Add/override cache headers
           "Cache-Control": this.buildCacheControl(settings),
@@ -117,12 +111,6 @@ export class CloudflareCache {
           "X-Cache-Region": request.cf?.colo || "unknown",
           ETag: `"${this.generateETag(response)}"`,
           "Last-Modified": new Date().toUTCString(),
-          // Force CORS headers to always be present
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods":
-            "GET, POST, PUT, DELETE, OPTIONS, PATCH",
-          "Access-Control-Allow-Headers":
-            "Content-Type, Authorization, X-Requested-With, Accept, Origin",
         },
       });
 

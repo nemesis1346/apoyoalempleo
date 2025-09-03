@@ -7,36 +7,37 @@ import { contactsService } from "../../services/contactsService";
 import ContactUnlockModal from "./ContactUnlockModal";
 
 const ContactCard = ({ contact }) => {
-  const { user, isAuthenticated, openAuthModal } = useAuth();
+  const { isAuthenticated, openAuthModal } = useAuth();
   const [isOpenContactDirectly, setIsOpenContactDirectly] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
-  const [isUnlocked, setIsUnlocked] = useState(false);
   const [userCredits, setUserCredits] = useState(0);
   const [checkingStatus, setCheckingStatus] = useState(false);
+
+  // Get unlock status from contact data (set by backend)
+  const isUnlocked = contact?.isUnlocked ?? false;
   const [unlockModalOpen, setUnlockModalOpen] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const cardRef = useRef(null);
 
-  // Check contact unlock status when user is authenticated
+  // Get user credits when authenticated
   useEffect(() => {
-    const checkUnlockStatus = async () => {
+    const getUserCredits = async () => {
       if (!isAuthenticated() || !contact?.id) return;
 
       try {
         setCheckingStatus(true);
         const response = await contactsService.checkUnlockStatus(contact.id);
         if (response.success) {
-          setIsUnlocked(response.isUnlocked);
           setUserCredits(response.userCredits);
         }
       } catch (error) {
-        console.error("Error checking unlock status:", error);
+        console.error("Error getting user credits:", error);
       } finally {
         setCheckingStatus(false);
       }
     };
 
-    checkUnlockStatus();
+    getUserCredits();
   }, [contact?.id, isAuthenticated]);
 
   const handleToggleContactDirectly = () => {
@@ -60,12 +61,12 @@ const ContactCard = ({ contact }) => {
       setUnlocking(true);
       const response = await contactsService.unlockContact(contact.id);
 
+      console.log("Unlock contact response:", response);
+
       if (response.success) {
-        setIsUnlocked(true);
         setUserCredits(response.creditsRemaining);
         setUnlockModalOpen(false);
         setIsOpenContactDirectly(true);
-        // Show success message
       }
     } catch (error) {
       console.error("Error unlocking contact:", error);
@@ -131,10 +132,12 @@ const ContactCard = ({ contact }) => {
       </div>
       <div className="flex flex-col gap-2 p-4">
         <div className="text-lg text-gray-700 font-semibold">
+          {!isUnlocked && <span className="mr-1">🔐</span>}
           {contact.name} - {contact.company?.name}
         </div>
         <div className="text-sm text-gray-600">
-          {contact.position} • {contact.city}
+          {isUnlocked && contact.position ? `${contact.position} • ` : ""}
+          {contact.city || "City not specified"}
         </div>
         <div className="flex mt-4">
           <button
@@ -161,23 +164,8 @@ const ContactCard = ({ contact }) => {
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 Checking...
               </>
-            ) : isUnlocked ? (
-              "Contact directly"
             ) : (
-              <>
-                <svg
-                  className="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Unlock contact (1 credit)
-              </>
+              "Contact directly"
             )}
           </button>
         </div>
@@ -200,28 +188,10 @@ const ContactCard = ({ contact }) => {
               >
                 Generate message
               </button>
-              {showEmail && isUnlocked && (
+              {showEmail && (
                 <div className="flex p-2 items-center justify-center text-center rounded-sm border-1 border-dashed border-gray-300">
                   <span className="text-black font-bold text-sm">
                     {contact.email}
-                  </span>
-                </div>
-              )}
-              {showEmail && !isUnlocked && (
-                <div className="flex p-2 items-center justify-center text-center rounded-sm border-1 border-dashed border-red-200 bg-red-50">
-                  <span className="text-red-600 font-bold text-sm flex items-center gap-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Email locked - Unlock to view
                   </span>
                 </div>
               )}
@@ -230,21 +200,7 @@ const ContactCard = ({ contact }) => {
               onClick={handleShowEmail}
               className="w-full py-2 rounded-lg text-sm text-gray-600 cursor-pointer border-1 border-gray-200 shadow-md hover:translate-y-[-1px] hover:shadow-none font-semibold transition-all duration-300 flex items-center justify-center gap-2"
             >
-              {!isUnlocked && (
-                <svg
-                  className="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              )}
               {showEmail ? "Hide" : "Show"} email
-              {!isUnlocked && " (requires unlock)"}
             </button>
 
             <div className="flex flex-col px-2 py-4 gap-2 rounded-lg border-1 border-gray-200">
