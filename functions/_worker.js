@@ -20,6 +20,11 @@ import { handleAuth } from "./api/auth.js";
 import { handleAdminRequest } from "./api/admin/index.js";
 import { handleCompaniesRequest } from "./api/companies/index.js";
 import { handleUploadRequest } from "./api/upload.js";
+import {
+  handleContactUnlockRequest,
+  handleContactStatusRequest,
+  handleUserUnlockedContactsRequest,
+} from "./api/contacts/unlock.js";
 
 // Utilities
 import { handleCORS, createResponse } from "./utils/cors.js";
@@ -74,6 +79,40 @@ export default {
         if (path.startsWith("/api/upload")) {
           return await handleUploadRequest(
             request.method,
+            request,
+            env,
+            authResult.payload,
+          );
+        }
+
+        // Contact unlock routes (require authentication - not cacheable)
+        if (
+          path.startsWith("/api/contacts/unlock") &&
+          request.method === "POST"
+        ) {
+          return await handleContactUnlockRequest(
+            request,
+            env,
+            authResult.payload,
+          );
+        }
+
+        if (
+          path.startsWith("/api/contacts/status") &&
+          request.method === "GET"
+        ) {
+          return await handleContactStatusRequest(
+            request,
+            env,
+            authResult.payload,
+          );
+        }
+
+        if (
+          path.startsWith("/api/contacts/unlocked") &&
+          request.method === "GET"
+        ) {
+          return await handleUserUnlockedContactsRequest(
             request,
             env,
             authResult.payload,

@@ -392,6 +392,58 @@ export const contactsService = {
       throw error;
     }
   },
+
+  /**
+   * Check if user has unlocked a specific contact
+   * @param {string|number} contactId - Contact ID
+   * @returns {Promise<Object>} Unlock status and user credits
+   */
+  checkUnlockStatus: async (contactId) => {
+    try {
+      return await api.get(`/contacts/status?contactId=${contactId}`);
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Unlock a contact by spending credits
+   * @param {string|number} contactId - Contact ID
+   * @returns {Promise<Object>} Unlock response with contact details
+   */
+  unlockContact: async (contactId) => {
+    try {
+      return await api.post("/contacts/unlock", { contactId });
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Get user's unlocked contacts
+   * @param {Object} params - Query parameters
+   * @param {number} [params.page=1] - Page number
+   * @param {number} [params.limit=10] - Items per page
+   * @returns {Promise<Object>} User's unlocked contacts
+   */
+  getUnlockedContacts: async (params = {}) => {
+    try {
+      const queryParams = new URLSearchParams();
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          queryParams.append(key, value);
+        }
+      });
+
+      const queryString = queryParams.toString();
+      const url = `/contacts/unlocked${queryString ? `?${queryString}` : ""}`;
+
+      return await api.get(url);
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default contactsService;

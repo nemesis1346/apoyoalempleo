@@ -2,14 +2,89 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { useAuth } from "../AuthContext";
+import { contactsService } from "../../services/contactsService";
+import ContactUnlockModal from "./ContactUnlockModal";
 
 const ContactCard = ({ contact }) => {
+  const { user, isAuthenticated, openAuthModal } = useAuth();
   const [isOpenContactDirectly, setIsOpenContactDirectly] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [userCredits, setUserCredits] = useState(0);
+  const [checkingStatus, setCheckingStatus] = useState(false);
+  const [unlockModalOpen, setUnlockModalOpen] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
   const cardRef = useRef(null);
 
+  // Check contact unlock status when user is authenticated
+  useEffect(() => {
+    const checkUnlockStatus = async () => {
+      if (!isAuthenticated() || !contact?.id) return;
+
+      try {
+        setCheckingStatus(true);
+        const response = await contactsService.checkUnlockStatus(contact.id);
+        if (response.success) {
+          setIsUnlocked(response.isUnlocked);
+          setUserCredits(response.userCredits);
+        }
+      } catch (error) {
+        console.error("Error checking unlock status:", error);
+      } finally {
+        setCheckingStatus(false);
+      }
+    };
+
+    checkUnlockStatus();
+  }, [contact?.id, isAuthenticated]);
+
   const handleToggleContactDirectly = () => {
-    setIsOpenContactDirectly((prev) => !prev);
+    if (!isAuthenticated()) {
+      // Show auth modal
+      openAuthModal();
+      return;
+    }
+
+    if (isUnlocked) {
+      // User has access, show contact info
+      setIsOpenContactDirectly((prev) => !prev);
+    } else {
+      // User needs to unlock, show confirmation modal
+      setUnlockModalOpen(true);
+    }
+  };
+
+  const handleUnlockContact = async () => {
+    try {
+      setUnlocking(true);
+      const response = await contactsService.unlockContact(contact.id);
+
+      if (response.success) {
+        setIsUnlocked(true);
+        setUserCredits(response.creditsRemaining);
+        setUnlockModalOpen(false);
+        setIsOpenContactDirectly(true);
+        // Show success message
+      }
+    } catch (error) {
+      console.error("Error unlocking contact:", error);
+      // Show error message
+      if (error.response?.status === 402) {
+        // Insufficient credits - modal will handle this
+        setUserCredits(error.response.data?.userCredits || 0);
+      }
+    } finally {
+      setUnlocking(false);
+    }
+  };
+
+  const handleShowEmail = () => {
+    if (isUnlocked) {
+      setShowEmail((prev) => !prev);
+    } else {
+      setUnlockModalOpen(true);
+    }
   };
 
   useEffect(() => {
@@ -64,7 +139,8 @@ const ContactCard = ({ contact }) => {
         <div className="flex mt-4">
           <button
             onClick={handleToggleContactDirectly}
-            className="w-full py-2 rounded-lg text-sm text-gray-600 cursor-pointer border-1 hover:translate-y-[-1px] font-semibold transition-all duration-300"
+            disabled={checkingStatus}
+            className="w-full py-2 rounded-lg text-sm cursor-pointer border-1 hover:translate-y-[-1px] font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             style={{
               borderColor: contact.company?.color || "#e7e7e7",
               boxShadow: `0 4px 12px color-mix(in srgb, ${
@@ -73,10 +149,36 @@ const ContactCard = ({ contact }) => {
               backgroundColor: isOpenContactDirectly
                 ? contact.company?.color || "#e7e7e7"
                 : "transparent",
-              color: isOpenContactDirectly ? "white" : "",
+              color: isOpenContactDirectly
+                ? "white"
+                : isUnlocked
+                ? "#4B5563"
+                : "#9CA3AF",
             }}
           >
-            Contact directly
+            {checkingStatus ? (
+              <>
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                Checking...
+              </>
+            ) : isUnlocked ? (
+              "Contact directly"
+            ) : (
+              <>
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Unlock contact (1 credit)
+              </>
+            )}
           </button>
         </div>
         {isOpenContactDirectly && (
@@ -98,19 +200,51 @@ const ContactCard = ({ contact }) => {
               >
                 Generate message
               </button>
-              {showEmail && (
+              {showEmail && isUnlocked && (
                 <div className="flex p-2 items-center justify-center text-center rounded-sm border-1 border-dashed border-gray-300">
                   <span className="text-black font-bold text-sm">
                     {contact.email}
                   </span>
                 </div>
               )}
+              {showEmail && !isUnlocked && (
+                <div className="flex p-2 items-center justify-center text-center rounded-sm border-1 border-dashed border-red-200 bg-red-50">
+                  <span className="text-red-600 font-bold text-sm flex items-center gap-1">
+                    <svg
+                      className="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Email locked - Unlock to view
+                  </span>
+                </div>
+              )}
             </div>
             <button
-              onClick={() => setShowEmail((prev) => !prev)}
-              className="w-full py-2 rounded-lg text-sm text-gray-600 cursor-pointer border-1 border-gray-200 shadow-md hover:translate-y-[-1px] hover:shadow-none font-semibold transition-all duration-300"
+              onClick={handleShowEmail}
+              className="w-full py-2 rounded-lg text-sm text-gray-600 cursor-pointer border-1 border-gray-200 shadow-md hover:translate-y-[-1px] hover:shadow-none font-semibold transition-all duration-300 flex items-center justify-center gap-2"
             >
+              {!isUnlocked && (
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              )}
               {showEmail ? "Hide" : "Show"} email
+              {!isUnlocked && " (requires unlock)"}
             </button>
 
             <div className="flex flex-col px-2 py-4 gap-2 rounded-lg border-1 border-gray-200">
@@ -161,6 +295,16 @@ const ContactCard = ({ contact }) => {
           </div>
         )}
       </div>
+
+      {/* Contact Unlock Modal */}
+      <ContactUnlockModal
+        isOpen={unlockModalOpen}
+        onClose={() => setUnlockModalOpen(false)}
+        onConfirm={handleUnlockContact}
+        contact={contact}
+        userCredits={userCredits}
+        isLoading={unlocking}
+      />
     </div>
   );
 };
