@@ -22,19 +22,19 @@ export async function handleContactsRequest(request, env, user) {
     }`;
 
     // Try cache first for GET requests
-    const cached = await cache.get(request, cacheKey);
-    if (cached) {
-      return cached;
-    }
+    // const cached = await cache.get(request, cacheKey);
+    // if (cached) {
+    //   return cached;
+    // }
 
     // Get fresh data
     let response;
     if (resourceOrContactId && !isNaN(Number(resourceOrContactId))) {
-      response = await getContact(resourceOrContactId, env, user);
+      return await getContact(resourceOrContactId, env, user);
     } else if (String(resourceOrContactId).startsWith("status")) {
       return await handleContactStatusRequest(request, env, user);
     } else {
-      response = await getContacts(env, user, url);
+      return await getContacts(env, user, url);
     }
 
     // Cache successful responses with shorter TTL for contacts data
@@ -570,7 +570,7 @@ async function invalidateUserContactCache(cache, user, contactId) {
     const patterns = [
       `/api/contacts/status?contactId=${contactId}`,
       `/api/contacts/unlocked`,
-      `/api/contacts`, // Admin contact lists might be affected
+      `/api/contacts`,
     ];
 
     for (const pattern of patterns) {
