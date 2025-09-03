@@ -143,7 +143,7 @@ async function getJobs(env, user, url) {
 
     // Get paginated results
     const stmt = env.DB.prepare(`
-      SELECT j.*, c.name as company_name, c.logo_url as company_logo_url
+      SELECT j.*, c.name as company_name, c.logo_url as company_logo_url, c.color as company_color
       FROM jobs j
       LEFT JOIN companies c ON j.company_id = c.id
       ${whereClause}
@@ -155,12 +155,14 @@ async function getJobs(env, user, url) {
 
     // Parse location JSON arrays in results
     const jobs = results.map((job) => {
-      const { company_logo_url, ...jobItem } = job;
+      const { company_logo_url, company_color, company_name, ...jobItem } = job;
       return {
         ...jobItem,
         location: job.location ? JSON.parse(job.location) : [],
         company: {
+          name: company_name,
           logo_url: company_logo_url,
+          color: company_color,
         },
       };
     });
@@ -273,7 +275,7 @@ async function createJob(request, env, user) {
 async function getJob(jobId, env, user) {
   try {
     const stmt = env.DB.prepare(`
-      SELECT j.*, c.name as company_name
+      SELECT j.*, c.name as company_name, c.logo_url as company_logo_url, c.color as company_color
       FROM jobs j
       LEFT JOIN companies c ON j.company_id = c.id
       WHERE j.id = ?
@@ -291,7 +293,16 @@ async function getJob(jobId, env, user) {
     }
 
     // Parse location JSON array
+    const { company_logo_url, company_color, company_name, ...jobItem } = job;
     job.location = job.location ? JSON.parse(job.location) : [];
+    job.company = {
+      name: company_name,
+      logo_url: company_logo_url,
+      color: company_color,
+    };
+    delete job.company_logo_url;
+    delete job.company_color;
+    delete job.company_name;
 
     return createResponse({ success: true, data: job });
   } catch (error) {

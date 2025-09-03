@@ -27,14 +27,14 @@ const CompanyPageSkeleton = () => {
           {/* Hero Banner Skeleton */}
           <div className="h-32 bg-gray-200 relative border-b">
             {/* Logo Skeleton */}
-            <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6">
+            <div className="absolute bottom-2 left-2 md:bottom-4 md:left-4">
               <div className="bg-gray-300 rounded-lg shadow-md border-1 border-gray-300 shadow-[0 8px 24px rgba(0, 0, 0, .06)]">
                 <div className="h-20 w-20 bg-gray-300 rounded-lg"></div>
               </div>
             </div>
 
             {/* Stats Skeleton */}
-            <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6">
+            <div className="absolute bottom-2 right-2 md:bottom-4 md:right-4">
               <div className="bg-white/90 backdrop-blur-sm px-3 py-2 rounded-lg shadow-md">
                 <div className="flex items-center gap-4">
                   <div className="h-3 w-12 bg-gray-300 rounded"></div>
@@ -45,7 +45,7 @@ const CompanyPageSkeleton = () => {
           </div>
 
           {/* Company Information Skeleton */}
-          <div className="p-4 sm:p-6">
+          <div className="p-2 md:p-4">
             {/* Company Name & Basic Info */}
             <div className="mb-4">
               <div className="h-8 sm:h-9 w-3/4 bg-gray-300 rounded mb-2"></div>

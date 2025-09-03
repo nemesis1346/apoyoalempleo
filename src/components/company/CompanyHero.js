@@ -20,7 +20,7 @@ const CompanyHero = ({ company }) => {
         }}
       >
         {/* Company Logo */}
-        <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6">
+        <div className="absolute bottom-2 left-2 md:bottom-4 md:left-4">
           <div
             className="bg-white rounded-lg shadow-md border-1 border-[#e7e7e7] shadow-[0 8px 24px rgba(0, 0, 0, .06)]"
             style={{
@@ -36,7 +36,7 @@ const CompanyHero = ({ company }) => {
         </div>
 
         {/* Company Stats */}
-        <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6">
+        <div className="absolute bottom-2 right-2 md:bottom-4 md:right-4">
           <div className="bg-white/90 backdrop-blur-sm px-3 py-2 rounded-lg shadow-md">
             <div className="flex items-center gap-4 text-xs text-gray-600">
               <span className="font-medium">
@@ -51,7 +51,7 @@ const CompanyHero = ({ company }) => {
       </div>
 
       {/* Company Information */}
-      <div className="p-4 sm:p-6">
+      <div className="p-2 md:p-4">
         {/* Company Name & Basic Info */}
         <div className="mb-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
