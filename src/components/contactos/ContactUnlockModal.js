@@ -35,7 +35,7 @@ const ContactUnlockModal = ({
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
             disabled={isLoading}
           >
             <svg
@@ -55,26 +55,25 @@ const ContactUnlockModal = ({
         </div>
 
         {/* Contact Info */}
-        <div className="mb-6">
+        <div>
           <div className="flex items-center gap-3 mb-3">
-            {contact?.company?.logo_url && (
-              <img
-                src={contact.company.logo_url}
-                alt="Company logo"
-                className="w-10 h-10 rounded-lg object-contain"
-              />
-            )}
+            <div className="w-10 h-10 rounded-lg text-black font-semibold text-lg flex items-center justify-center border-1 border-gray-300">
+              {contact?.name}
+            </div>
             <div>
-              <h4 className="font-medium text-gray-900">{contact?.name}</h4>
+              <h4 className="font-medium text-gray-900">
+                Unlock {contact?.name} • {contact?.company?.name}
+              </h4>
               <p className="text-sm text-gray-600">
-                {contact?.position} • {contact?.company?.name}
+                {contact?.city} · Anonymized contact. Details revealed after
+                unlock.
               </p>
             </div>
           </div>
         </div>
 
         {/* Credits Info */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+        <div className="mb-4 p-4 bg-gray-50 rounded-lg">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-gray-600">Your Credits:</span>
             <span
@@ -101,7 +100,7 @@ const ContactUnlockModal = ({
 
         {/* Error Message */}
         {hasInsufficientCredits && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0">
                 <svg
@@ -131,7 +130,7 @@ const ContactUnlockModal = ({
 
         {/* Success Info */}
         {!hasInsufficientCredits && (
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0">
                 <svg
@@ -163,7 +162,7 @@ const ContactUnlockModal = ({
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
             disabled={isLoading}
           >
             Cancel
@@ -174,7 +173,7 @@ const ContactUnlockModal = ({
                 // TODO: Redirect to credits purchase page
                 onClose();
               }}
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors cursor-pointer"
             >
               Buy Credits
             </button>
@@ -182,7 +181,7 @@ const ContactUnlockModal = ({
             <button
               onClick={handleConfirm}
               disabled={isLoading}
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center gap-2">
