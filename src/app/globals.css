@@ -25,3 +25,7 @@ body {
   font-display: block;
   overflow: hidden;
 }
+
+button {
+  cursor: pointer;
+}
