@@ -18,7 +18,7 @@
 // API route handlers
 import { handleAuth } from "./api/auth.js";
 import { handleAdminRequest } from "./api/admin/index.js";
-import { handleCompaniesRequest } from "./api/companies/index.js";
+import { handleAttributesRequest } from "./api/attributes/index.js";
 import { handleUploadRequest } from "./api/upload.js";
 import { handleContactsRequest } from "./api/contacts/index.js";
 
@@ -58,9 +58,9 @@ export default {
         }
 
         // Companies routes (public - highly cacheable)
-        if (path.startsWith("/api/companies")) {
-          // Cache logic is handled inside handleCompaniesRequest
-          return await handleCompaniesRequest(request, env);
+        if (path.startsWith("/api/attributes")) {
+          // Cache logic is handled inside handleAttributesRequest
+          return await handleAttributesRequest(request, env);
         }
 
         // Protected routes - require authentication
