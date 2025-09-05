@@ -32,10 +32,10 @@ const SearchSection = ({ category, search }) => {
     const savedSearchTerms = getItem(`${category}SearchTerms`);
     if (savedSearchTerms) {
       setSearchKey(savedSearchTerms.searchKey || "");
-      setCity(savedSearchTerms.city || "Columbia");
+      setCity(savedSearchTerms.city || "Colombia");
     } else {
       setSearchKey("");
-      setCity("Columbia");
+      setCity("Colombia");
     }
   }, []);
 

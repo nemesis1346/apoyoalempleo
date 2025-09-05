@@ -1,7 +1,7 @@
 import JobCard from "./JobCard";
 import JobCardSkeleton from "./JobCardSkeleton";
 
-const JobsList = ({ jobs, loadingMore }) => (
+const JobsList = ({ jobs, loadingMore = false }) => (
   <div className="space-y-4">
     {jobs.map((job, index) => (
       <JobCard key={index} job={job} />
