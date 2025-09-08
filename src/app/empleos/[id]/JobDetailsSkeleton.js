@@ -35,7 +35,7 @@ const JobDetailsSkeleton = () => {
               <div className="h-6 bg-gray-200 rounded-lg animate-pulse w-1/3"></div>
               <div className="h-6 w-12 bg-gray-200 rounded-full animate-pulse"></div>
             </div>
-            
+
             <div className="border border-gray-200 rounded-xl bg-white p-3 shadow-lg mb-2">
               <div className="grid grid-cols-[56px_1fr_auto] gap-3 items-center">
                 <div className="w-14 h-14 rounded-xl bg-yellow-100 border border-gray-200 animate-pulse"></div>
@@ -47,9 +47,9 @@ const JobDetailsSkeleton = () => {
                 <div className="h-8 w-20 bg-gray-200 rounded-full animate-pulse"></div>
               </div>
             </div>
-            
+
             <div className="h-10 bg-gray-200 rounded-xl animate-pulse w-full"></div>
-            
+
             <div className="h-3 bg-gray-200 rounded-lg animate-pulse mt-2 w-3/4"></div>
           </section>
 
@@ -62,7 +62,7 @@ const JobDetailsSkeleton = () => {
               </div>
               <div className="h-3 bg-gray-200 rounded-lg animate-pulse w-24"></div>
             </div>
-            
+
             <div className="space-y-2">
               {[1, 2].map((i) => (
                 <div
@@ -95,10 +95,10 @@ const JobDetailsSkeleton = () => {
               <div className="h-6 bg-gray-200 rounded-lg animate-pulse w-32"></div>
               <div className="h-6 w-12 bg-gray-200 rounded-full animate-pulse"></div>
             </div>
-            
+
             <div className="border border-gray-200 rounded-xl bg-white p-4 shadow-lg">
               <div className="h-3 bg-gray-200 rounded-lg animate-pulse mb-4 w-3/4"></div>
-              
+
               <div className="grid md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <div className="h-4 bg-gray-200 rounded-lg animate-pulse mb-2 w-1/2"></div>
@@ -123,14 +123,14 @@ const JobDetailsSkeleton = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex gap-2 border rounded-xl p-2 border-gray-200 bg-white">
                 <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
                 <div className="flex-1 h-10 bg-gray-200 rounded-xl animate-pulse"></div>
                 <div className="w-16 h-10 bg-gray-200 rounded-xl animate-pulse"></div>
               </div>
               <div className="h-3 bg-gray-200 rounded-lg animate-pulse mt-1 w-1/2"></div>
-              
+
               <div className="flex justify-end mt-3">
                 <div className="h-8 w-32 bg-gray-200 rounded-xl animate-pulse"></div>
               </div>
@@ -143,13 +143,13 @@ const JobDetailsSkeleton = () => {
               <div className="h-6 bg-gray-200 rounded-lg animate-pulse w-32"></div>
               <div className="h-6 w-12 bg-gray-200 rounded-full animate-pulse"></div>
             </div>
-            
+
             <div className="border border-gray-200 rounded-xl bg-white p-4 shadow-lg">
               <div className="flex justify-between items-center mb-2">
                 <div className="h-3 bg-gray-200 rounded-lg animate-pulse w-1/2"></div>
                 <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
               </div>
-              
+
               <div className="flex gap-2 flex-wrap">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                   <div
