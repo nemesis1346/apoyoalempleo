@@ -98,12 +98,6 @@ function ContactsSection({ contacts, selectedContactId, onContactSelect }) {
             <div className="text-xs text-gray-600 mb-1">
               {contacts[0].city} ·{" "}
               <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
-                Verified ≤24h
-              </span>{" "}
-              <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
-                Reply {contacts[0].reply}%
-              </span>{" "}
-              <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
                 Active: {contacts[0].active}
               </span>
             </div>
@@ -650,15 +644,6 @@ function StickyApplyFooter({ selectedContact }) {
             Selected: {selectedContact.initials} · {selectedContact.role} (
             {selectedContact.city})
           </span>
-        </div>
-        <div className="text-xs text-gray-500 text-center">
-          Next: checkout to unlock {selectedContact.initials} (
-          {selectedContact.role}) at {selectedContact.company}. We'll open your
-          message, pre-filled with subject + first line.
-        </div>
-        <div className="text-xs text-gray-500 text-center">
-          No account required · Verified ≤24h · 1 contact / 5 days · Bounce →
-          replacement
         </div>
       </div>
     </div>
