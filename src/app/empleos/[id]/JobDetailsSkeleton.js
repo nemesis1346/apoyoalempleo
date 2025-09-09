@@ -4,26 +4,52 @@ const JobDetailsSkeleton = () => {
       <div className="container max-w-screen-md mx-auto">
         <div className="bg-white shadow-lg overflow-hidden py-4 px-4">
           {/* Hero section skeleton */}
-          <header className="relative border border-yellow-300 rounded-2xl bg-white shadow-lg overflow-hidden p-4 mb-4">
-            <div className="absolute left-0 right-0 top-0 h-24 z-0 bg-gradient-to-r from-yellow-400 to-yellow-300 opacity-60"></div>
-            <div className="relative z-10 grid grid-cols-[64px_1fr] gap-3 items-center">
-              <div className="w-16 h-16 rounded-xl bg-yellow-400 border border-yellow-300 shadow-lg animate-pulse"></div>
-              <div>
-                <div className="h-6 bg-gray-200 rounded-lg animate-pulse mb-1"></div>
-                <div className="h-4 bg-gray-200 rounded-lg animate-pulse w-2/3 mb-2"></div>
-                <div className="flex gap-2 flex-wrap">
-                  <div className="min-w-24 bg-white border border-gray-200 rounded-xl p-2 shadow-sm">
-                    <div className="h-3 bg-gray-200 rounded animate-pulse mb-1"></div>
-                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  </div>
-                  <div className="min-w-24 bg-white border border-gray-200 rounded-xl p-2 shadow-sm">
-                    <div className="h-3 bg-gray-200 rounded animate-pulse mb-1"></div>
-                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  </div>
-                  <div className="min-w-20 bg-white border border-gray-200 rounded-xl p-2 shadow-sm">
-                    <div className="h-3 bg-gray-200 rounded animate-pulse mb-1"></div>
-                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  </div>
+          <header
+            className="mb-4 min-h-32 border-b p-4"
+            style={{
+              borderBottomColor: "#e7e7e7",
+              background: `
+                linear-gradient(180deg, #e7e7e7 0 20%, transparent 20% 100%),
+                radial-gradient(1000px 320px at 90% -80px, rgba(255,255,255,.14), rgba(255,255,255,0) 60%),
+                linear-gradient(180deg, #e7e7e7 0 20%, #fff 85%)
+              `,
+            }}
+          >
+            <div className="flex items-center gap-2 md:gap-4 pt-4">
+              {/* Company Logo */}
+              <div
+                className="bg-white rounded-lg shadow-md border-1 border-[#e7e7e7] shadow-[0 8px 24px rgba(0, 0, 0, .06)] w-20 h-20 flex-shrink-0 flex justify-center items-center animate-pulse"
+                style={{
+                  backgroundColor: "#e7e7e7",
+                }}
+              ></div>
+
+              {/* Job Information */}
+              <div className="flex flex-col w-full px-2 py-2 gap-1 justify-between">
+                <div className="h-6 bg-white/30 rounded-lg animate-pulse mb-1"></div>
+                <div className="h-4 bg-white/30 rounded-lg animate-pulse w-1/2 mb-1"></div>
+                <div className="h-4 bg-white/30 rounded-lg animate-pulse w-2/3"></div>
+              </div>
+            </div>
+
+            {/* Job Stats */}
+            <div className="flex gap-1 mt-4 justify-center">
+              <div className="flex justify-center items-center p-2 rounded-lg bg-white border border-gray-300 w-22">
+                <div className="flex flex-col text-xs">
+                  <div className="h-3 bg-gray-200 rounded animate-pulse mb-1"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              </div>
+              <div className="flex justify-center items-center p-2 rounded-lg bg-white border border-gray-300 w-22">
+                <div className="flex flex-col text-xs">
+                  <div className="h-3 bg-gray-200 rounded animate-pulse mb-1"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              </div>
+              <div className="flex justify-center items-center p-2 rounded-lg bg-white border border-gray-300 w-22">
+                <div className="flex flex-col text-xs">
+                  <div className="h-3 bg-gray-200 rounded animate-pulse mb-1"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
                 </div>
               </div>
             </div>
@@ -37,12 +63,20 @@ const JobDetailsSkeleton = () => {
             </div>
 
             <div className="border border-gray-200 rounded-xl bg-white p-3 shadow-lg mb-2">
-              <div className="grid grid-cols-[56px_1fr_auto] gap-3 items-center">
-                <div className="w-14 h-14 rounded-xl bg-yellow-100 border border-gray-200 animate-pulse"></div>
+              <div className="grid grid-cols-[56px_1fr_auto] gap-2 items-center">
+                <div className="flex h-full">
+                  <div className="w-14 h-14 rounded-xl bg-gray-100 border border-gray-300 animate-pulse"></div>
+                </div>
                 <div>
-                  <div className="h-4 bg-gray-200 rounded-lg animate-pulse mb-1"></div>
-                  <div className="h-3 bg-gray-200 rounded-lg animate-pulse mb-1 w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded-lg animate-pulse w-1/2"></div>
+                  <div className="h-4 bg-gray-200 rounded-lg animate-pulse mb-2"></div>
+                  <div className="flex md:flex-row gap-1 mb-1">
+                    <div className="h-3 bg-gray-200 rounded-lg animate-pulse w-16"></div>
+                    <div className="h-3 bg-gray-200 rounded-lg animate-pulse w-16"></div>
+                  </div>
+                  <div className="flex items-center gap-1 mb-1">
+                    <div className="h-3 bg-gray-200 rounded-lg animate-pulse w-12"></div>
+                    <div className="h-4 bg-gray-200 rounded-full animate-pulse w-16"></div>
+                  </div>
                 </div>
                 <div className="h-8 w-20 bg-gray-200 rounded-full animate-pulse"></div>
               </div>
@@ -175,18 +209,6 @@ const JobDetailsSkeleton = () => {
               </div>
             </div>
           </section>
-        </div>
-      </div>
-
-      {/* Sticky Apply Footer skeleton */}
-      <div className="fixed left-0 right-0 bottom-0 z-50 bg-white border-t border-gray-200 p-3 shadow-lg">
-        <div className="container max-w-screen-md mx-auto">
-          <div className="flex gap-2 mb-2">
-            <div className="h-12 bg-gradient-to-b from-yellow-300 to-yellow-400 border border-yellow-300 rounded-xl animate-pulse flex-1"></div>
-            <div className="h-12 w-32 bg-gray-200 rounded-full animate-pulse"></div>
-          </div>
-          <div className="h-3 bg-gray-200 rounded-lg animate-pulse w-2/3 mx-auto"></div>
-          <div className="h-3 bg-gray-200 rounded-lg animate-pulse mt-1 w-3/4 mx-auto"></div>
         </div>
       </div>
     </div>

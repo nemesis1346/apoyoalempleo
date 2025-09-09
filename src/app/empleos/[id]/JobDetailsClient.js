@@ -7,7 +7,7 @@ import { useState } from "react";
 function JobHeroSection({ job, contacts, liveJobs }) {
   return (
     <header
-      className="mb-4 min-h-32 border-b p-2 md:p-4"
+      className="mb-4 min-h-32 border-b p-4"
       style={{
         borderBottomColor: job.company.color || "#e7e7e7",
         background: `
@@ -21,7 +21,7 @@ function JobHeroSection({ job, contacts, liveJobs }) {
         `,
       }}
     >
-      <div className="flex gap-2 md:gap-4 pt-4">
+      <div className="flex items-center gap-2 md:gap-4 pt-4">
         {/* Company Logo */}
         <div
           className="bg-white rounded-lg shadow-md border-1 border-[#e7e7e7] shadow-[0 8px 24px rgba(0, 0, 0, .06)] w-20 h-20 flex-shrink-0 flex justify-center items-center"
@@ -37,15 +37,19 @@ function JobHeroSection({ job, contacts, liveJobs }) {
         </div>
 
         {/* Job Information */}
-        <div className="flex flex-col justify-between">
-          <h1 className="text-xl sm:text-2xl font-bold text-black pt-4">
+        <div className="flex flex-col w-full px-2 py-2 gap-1 justify-between">
+          <h1 className="text-xl font-bold text-white drop-shadow-lg">
             {job.title}
           </h1>
+
+          <div className="text-white text-sm font-semibold drop-shadow">
+            🏢 {job.company.name}
+          </div>
 
           {/* Location */}
           <div className="flex items-center gap-1">
             <svg
-              className="w-4 h-4 text-gray-500"
+              className="w-4 h-4 text-white/80"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -63,40 +67,31 @@ function JobHeroSection({ job, contacts, liveJobs }) {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <span className="text-gray-600 text-sm">
+            <span className="text-white text-sm drop-shadow">
               {job.location?.join(", ") || "-"}
             </span>
           </div>
         </div>
       </div>
+
       {/* Job Stats */}
-      <div className="flex gap-1 mt-4 justify-end">
-        <div className="bg-gradient-to-br from-green-100 to-green-200 backdrop-blur-sm px-2 py-1 rounded-lg shadow-md border border-green-300">
-          <div className="flex items-center gap-4 text-xs text-green-700">
-            <span className="font-medium">
-              Status:{" "}
-              <span className="font-bold text-green-800">🟢 Active</span>
-            </span>
+      <div className="flex gap-1 mt-4 justify-center">
+        <div className="flex items-center p-2 rounded-lg bg-white border border-gray-300 w-22">
+          <div className="flex flex-col text-xs">
+            <span>Contacts</span>
+            <span className="font-bold">{contacts?.length || 0} verified</span>
           </div>
         </div>
-        <div className="bg-gradient-to-br from-green-100 to-green-200 backdrop-blur-sm px-2 py-1 rounded-lg shadow-md border border-green-300">
-          <div className="flex items-center gap-4 text-xs text-green-700">
-            <span className="font-medium">
-              Contacts:{" "}
-              <span className="font-bold text-green-800">
-                {contacts?.length || 0} verified
-              </span>
-            </span>
+        <div className="flex items-center p-2 rounded-lg bg-white border border-gray-300 w-22">
+          <div className="flex flex-col text-xs">
+            <span>Live Listings</span>
+            <span className="font-bold">{liveJobs?.length || 0}</span>
           </div>
         </div>
-        <div className="bg-gradient-to-br from-green-100 to-green-200 backdrop-blur-sm px-2 py-1 rounded-lg shadow-md border border-green-300">
-          <div className="flex items-center gap-4 text-xs text-green-700">
-            <span className="font-medium">
-              Live Listings:{" "}
-              <span className="font-bold text-green-800">
-                {liveJobs?.length || 0}
-              </span>
-            </span>
+        <div className="flex items-center p-2 rounded-lg bg-white border border-gray-300 w-22">
+          <div className="flex flex-col text-xs">
+            <span>Status</span>
+            <span className="font-bold">Active</span>
           </div>
         </div>
       </div>
@@ -167,19 +162,21 @@ function ContactsSection({
             </div>
           </div>
           <div>
-            <h3 className="font-bold text-gray-800 mb-1 text-nowrap mb-2">
-              👤 Name: 🔒 · {contacts[0].role} — {contacts[0].company}
+            <h3 className="font-bold text-gray-800 mb-2">
+              👤 Name: {contacts[0].initials} 🔒
             </h3>
-            <div className="text-xs text-gray-600 mb-1">
-              {contacts[0].city} ·{" "}
-              <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full text-nowrap">
+            <div className="flex md:flex-row gap-1 text-xs text-gray-600 font-bold mb-1">
+              <div>📧 Email: 🔒</div>
+              <div className="hidden md:block">•</div>
+              <div>📞 Phone: 🔒</div>
+            </div>
+            <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
+              <span className="text-gray-600 font-bold">
+                {contacts[0].city} •{" "}
+              </span>
+              <span className="border border-gray-300 bg-gray-50 px-1 py-0.5 rounded-full">
                 Active: {contacts[0].active}
               </span>
-            </div>
-            <div className="flex flex-col md:flex-row gap-1 text-xs text-gray-600 font-bold mb-1">
-              <div>Email: {contacts[0].domain} 🔒</div>
-              <div className="hidden md:block">·</div>
-              <div>Phone: 🔒</div>
             </div>
           </div>
           <span className="border border-gray-300 bg-gray-50 px-2 py-1 rounded-full text-xs text-nowrap">
@@ -224,20 +221,20 @@ function ContactsSection({
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-800 mb-2">
-                    👤 Name: 🔒 · {contact.role} — {contact.company}
+                    👤 Name: {contact.initials} 🔒
                   </h3>
-                  <div className="text-xs text-gray-600 mb-1">
-                    {contact.city} ·{" "}
-                    <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full text-nowrap">
+                  <div className="flex md:flex-row gap-1 text-xs text-gray-600 font-bold mb-1">
+                    <div>📧 Email: 🔒</div>
+                    <div className="hidden md:block">•</div>
+                    <div>📞 Phone: 🔒</div>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
+                    <span className="text-gray-600 font-bold">
+                      {contact.city} •{" "}
+                    </span>
+                    <span className="border border-gray-300 bg-gray-50 px-1 py-0.5 rounded-full">
                       Active: {contact.active}
                     </span>
-                  </div>
-                  <div className="text-xs text-gray-600 font-bold mb-1">
-                    <div className="md:flex md:gap-1">
-                      <div>Email: {contact.domain} 🔒</div>
-                      <div className="hidden md:block">·</div>
-                      <div>Phone: 🔒</div>
-                    </div>
                   </div>
                 </div>
                 <span className="border border-gray-300 bg-gray-50 px-2 py-1 rounded-full text-xs">
@@ -316,7 +313,7 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
                   <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
                     {liveJob.source}
                   </span>{" "}
-                  · {liveJob.city} ·{" "}
+                  • {liveJob.city} •{" "}
                   <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
                     {freshness(liveJob.ageHours)}
                   </span>
@@ -375,7 +372,7 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
                       <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
                         {liveJob.source}
                       </span>{" "}
-                      · {liveJob.city} ·{" "}
+                      • {liveJob.city} •{" "}
                       <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
                         {freshness(liveJob.ageHours)}
                       </span>
@@ -671,7 +668,7 @@ function ReadySummarySection({
         <div className="flex justify-between items-center">
           <span className="font-bold">Contact</span>
           <span className="text-sm">
-            {selectedContact.initials} · {selectedContact.role} —{" "}
+            {selectedContact.initials} • {selectedContact.role} —{" "}
             {selectedContact.city}{" "}
             <span className="ml-1 border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full text-xs">
               Reply {selectedContact.reply}%
@@ -732,16 +729,21 @@ function ReadySummarySection({
 }
 
 // Sticky Apply Footer Component
-function StickyApplyFooter({ selectedContact }) {
+function StickyApplyFooter({ company, selectedContact }) {
   return (
     <div className="fixed left-0 right-0 bottom-0 z-50 bg-white border-t border-gray-200 p-3 shadow-lg">
       <div className="container max-w-screen-md mx-auto">
         <div className="flex flex-col gap-2 mb-2">
-          <button className="flex-1 bg-gradient-to-b from-yellow-300 to-yellow-400 border border-yellow-300 text-yellow-900 font-black px-4 py-3 rounded-xl shadow-lg hover:from-yellow-400 hover:to-yellow-500 transition-all text-center">
+          <button
+            className="flex-1 border border-gray-300 text-white font-bold px-4 py-3 rounded-xl shadow-lg text-center"
+            style={{
+              backgroundColor: company.color || "#e7e7e7",
+            }}
+          >
             Apply now
           </button>
           <span className="border border-gray-300 bg-gray-50 py-2 rounded-full text-xs text-center">
-            Selected: {selectedContact.initials} · {selectedContact.role} (
+            Selected: {selectedContact.initials} • {selectedContact.role} (
             {selectedContact.city})
           </span>
         </div>
@@ -912,7 +914,10 @@ const JobDetailsClient = ({ job }) => {
         </div>
       </div>
 
-      <StickyApplyFooter selectedContact={selectedContact} />
+      <StickyApplyFooter
+        company={job.company}
+        selectedContact={selectedContact}
+      />
     </div>
   );
 };
