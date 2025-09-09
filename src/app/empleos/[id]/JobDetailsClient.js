@@ -6,40 +6,97 @@ import { useState } from "react";
 // Job Hero Section Component
 function JobHeroSection({ job, contacts, liveJobs }) {
   return (
-    <header className="relative border border-yellow-300 rounded-2xl bg-white shadow-lg overflow-hidden p-4 mb-4">
-      <div className="absolute left-0 right-0 top-0 h-24 z-0 bg-gradient-to-r from-yellow-400 to-yellow-300 opacity-60"></div>
-      <div className="relative z-10 grid grid-cols-[64px_1fr] gap-3 items-center">
-        <div className="w-16 h-16 rounded-xl bg-yellow-400 border border-yellow-300 flex items-center justify-center shadow-lg font-black text-yellow-900">
-          {job?.company?.name?.substring(0, 2)?.toUpperCase() || "CO"}
+    <header
+      className="mb-4 min-h-32 border-b p-2 md:p-4"
+      style={{
+        borderBottomColor: job.company.color || "#e7e7e7",
+        background: `
+          linear-gradient(180deg, ${
+            job.company.color || "#e7e7e7"
+          } 0 20%, transparent 20% 100%),
+          radial-gradient(1000px 320px at 90% -80px, rgba(255,255,255,.14), rgba(255,255,255,0) 60%),
+          linear-gradient(180deg, ${
+            job.company.color || "#e7e7e7"
+          } 0 20%, #fff 85%)
+        `,
+      }}
+    >
+      <div className="flex gap-2 md:gap-4 pt-4">
+        {/* Company Logo */}
+        <div
+          className="bg-white rounded-lg shadow-md border-1 border-[#e7e7e7] shadow-[0 8px 24px rgba(0, 0, 0, .06)] w-20 h-20 flex-shrink-0 flex justify-center items-center"
+          style={{
+            backgroundColor: job.company.color || "#e7e7e7",
+          }}
+        >
+          <img
+            src={job.company.logo_url || "/company-logo.png"}
+            alt={`${job.company.name} logo`}
+            className="h-full w-full object-contain rounded-lg"
+          />
         </div>
-        <div>
-          <h1 className="text-xl font-black text-yellow-900 mb-1">
-            {job?.title || "Job Title"}
+
+        {/* Job Information */}
+        <div className="flex flex-col justify-between">
+          <h1 className="text-xl sm:text-2xl font-bold text-black pt-4">
+            {job.title}
           </h1>
-          <p className="text-yellow-800 opacity-90 mb-2">
-            {job?.location?.join(", ") || "Location"} ·{" "}
-            {job?.experience_level || "Entry-level"} ·{" "}
-            {job?.employment_type || "Full-time"}
-          </p>
-          <div className="flex gap-2 flex-wrap">
-            <div className="min-w-24 bg-white border border-gray-200 rounded-xl p-2 shadow-sm">
-              <div className="text-xs text-gray-500 font-bold">Contacts</div>
-              <div className="font-black text-sm text-gray-800">
-                {contacts.length} verified
-              </div>
-            </div>
-            <div className="min-w-24 bg-white border border-gray-200 rounded-xl p-2 shadow-sm">
-              <div className="text-xs text-gray-500 font-bold">
-                Live listings
-              </div>
-              <div className="font-black text-sm text-gray-800">
-                {liveJobs.length}
-              </div>
-            </div>
-            <div className="min-w-20 bg-white border border-gray-200 rounded-xl p-2 shadow-sm">
-              <div className="text-xs text-gray-500 font-bold">Status</div>
-              <div className="font-black text-sm text-gray-800">Open</div>
-            </div>
+
+          {/* Location */}
+          <div className="flex items-center gap-1">
+            <svg
+              className="w-4 h-4 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            <span className="text-gray-600 text-sm">
+              {job.location?.join(", ") || "-"}
+            </span>
+          </div>
+        </div>
+      </div>
+      {/* Job Stats */}
+      <div className="flex gap-1 mt-4 justify-end">
+        <div className="bg-gradient-to-br from-green-100 to-green-200 backdrop-blur-sm px-2 py-1 rounded-lg shadow-md border border-green-300">
+          <div className="flex items-center gap-4 text-xs text-green-700">
+            <span className="font-medium">
+              Status:{" "}
+              <span className="font-bold text-green-800">🟢 Active</span>
+            </span>
+          </div>
+        </div>
+        <div className="bg-gradient-to-br from-green-100 to-green-200 backdrop-blur-sm px-2 py-1 rounded-lg shadow-md border border-green-300">
+          <div className="flex items-center gap-4 text-xs text-green-700">
+            <span className="font-medium">
+              Contacts:{" "}
+              <span className="font-bold text-green-800">
+                {contacts?.length || 0} verified
+              </span>
+            </span>
+          </div>
+        </div>
+        <div className="bg-gradient-to-br from-green-100 to-green-200 backdrop-blur-sm px-2 py-1 rounded-lg shadow-md border border-green-300">
+          <div className="flex items-center gap-4 text-xs text-green-700">
+            <span className="font-medium">
+              Live Listings:{" "}
+              <span className="font-bold text-green-800">
+                {liveJobs?.length || 0}
+              </span>
+            </span>
           </div>
         </div>
       </div>
@@ -48,7 +105,12 @@ function JobHeroSection({ job, contacts, liveJobs }) {
 }
 
 // HR Contacts Section Component
-function ContactsSection({ contacts, selectedContactId, onContactSelect }) {
+function ContactsSection({
+  company,
+  contacts,
+  selectedContactId,
+  onContactSelect,
+}) {
   const [showMoreContacts, setShowMoreContacts] = useState(false);
   const [showGuideHR, setShowGuideHR] = useState(false);
 
@@ -83,35 +145,44 @@ function ContactsSection({ contacts, selectedContactId, onContactSelect }) {
 
       <div
         className={`border border-gray-200 rounded-xl bg-white p-3 shadow-lg cursor-pointer ${
-          selectedContactId === "p1" ? "ring-2 ring-yellow-400 shadow-xl" : ""
+          selectedContactId === "p1" ? "ring-2 shadow-xl" : ""
         } mb-2`}
+        style={{
+          ...(selectedContactId === "p1" && {
+            "--tw-ring-color": company.color || "#e7e7e7",
+            "--tw-ring-opacity": "1",
+          }),
+        }}
         onClick={() => onContactSelect("p1")}
       >
-        <div className="grid grid-cols-[56px_1fr_auto] gap-3 items-center">
-          <div className="w-14 h-14 rounded-xl bg-yellow-100 border border-gray-200 flex items-center justify-center font-black text-yellow-900">
-            {contacts[0].initials}
+        <div className="grid grid-cols-[56px_1fr_auto] gap-2 items-center">
+          <div className="flex h-full">
+            <div
+              className="w-14 h-14 rounded-xl border border-gray-300 flex items-center justify-center font-black text-white text-nowrap"
+              style={{
+                backgroundColor: company.color || "#e7e7e7",
+              }}
+            >
+              {contacts[0].initials}
+            </div>
           </div>
           <div>
-            <h3 className="font-bold text-gray-800 mb-1">
+            <h3 className="font-bold text-gray-800 mb-1 text-nowrap mb-2">
               👤 Name: 🔒 · {contacts[0].role} — {contacts[0].company}
             </h3>
             <div className="text-xs text-gray-600 mb-1">
               {contacts[0].city} ·{" "}
-              <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
-                Verified ≤24h
-              </span>{" "}
-              <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
-                Reply {contacts[0].reply}%
-              </span>{" "}
-              <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
+              <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full text-nowrap">
                 Active: {contacts[0].active}
               </span>
             </div>
-            <div className="text-xs text-gray-600">
-              Email: {contacts[0].domain} 🔒 · Phone: 🔒
+            <div className="flex flex-col md:flex-row gap-1 text-xs text-gray-600 font-bold mb-1">
+              <div>Email: {contacts[0].domain} 🔒</div>
+              <div className="hidden md:block">·</div>
+              <div>Phone: 🔒</div>
             </div>
           </div>
-          <span className="border border-gray-300 bg-gray-50 px-2 py-1 rounded-full text-xs">
+          <span className="border border-gray-300 bg-gray-50 px-2 py-1 rounded-full text-xs text-nowrap">
             {selectedContactId === "p1" ? "Selected" : "Tap to select"}
           </span>
         </div>
@@ -130,34 +201,43 @@ function ContactsSection({ contacts, selectedContactId, onContactSelect }) {
             <div
               key={contact.id}
               className={`border border-gray-200 rounded-xl bg-white p-3 shadow-lg cursor-pointer ${
-                selectedContactId === contact.id
-                  ? "ring-2 ring-yellow-400 shadow-xl"
-                  : ""
+                selectedContactId === contact.id ? "ring-2 shadow-xl" : ""
               }`}
+              style={{
+                ...(selectedContactId === contact.id && {
+                  "--tw-ring-color": company.color || "#e7e7e7",
+                  "--tw-ring-opacity": "1",
+                }),
+              }}
               onClick={() => onContactSelect(contact.id)}
             >
-              <div className="grid grid-cols-[56px_1fr_auto] gap-3 items-center">
-                <div className="w-14 h-14 rounded-xl bg-yellow-100 border border-gray-200 flex items-center justify-center font-black text-yellow-900">
-                  {contact.initials}
+              <div className="grid grid-cols-[56px_1fr_auto] gap-2 items-center">
+                <div className="flex h-full">
+                  <div
+                    className="w-14 h-14 rounded-xl border border-gray-300 flex items-center justify-center font-black text-white text-nowrap"
+                    style={{
+                      backgroundColor: company.color || "#e7e7e7",
+                    }}
+                  >
+                    {contact.initials}
+                  </div>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-800 mb-1">
+                  <h3 className="font-bold text-gray-800 mb-2">
                     👤 Name: 🔒 · {contact.role} — {contact.company}
                   </h3>
                   <div className="text-xs text-gray-600 mb-1">
                     {contact.city} ·{" "}
-                    <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
-                      Verified ≤24h
-                    </span>{" "}
-                    <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
-                      Reply {contact.reply}%
-                    </span>{" "}
-                    <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
+                    <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full text-nowrap">
                       Active: {contact.active}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-600">
-                    Email: {contact.domain} 🔒 · Phone: 🔒
+                  <div className="text-xs text-gray-600 font-bold mb-1">
+                    <div className="md:flex md:gap-1">
+                      <div>Email: {contact.domain} 🔒</div>
+                      <div className="hidden md:block">·</div>
+                      <div>Phone: 🔒</div>
+                    </div>
                   </div>
                 </div>
                 <span className="border border-gray-300 bg-gray-50 px-2 py-1 rounded-full text-xs">
@@ -212,10 +292,14 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
           <div
             key={liveJob.id}
             className={`border border-gray-200 rounded-xl bg-white p-3 shadow-lg cursor-pointer ${
-              extJob?.id === liveJob.id
-                ? "ring-2 ring-yellow-400 shadow-xl"
-                : ""
+              extJob?.id === liveJob.id ? "ring-2 shadow-xl" : ""
             }`}
+            style={{
+              ...(extJob?.id === liveJob.id && {
+                "--tw-ring-color": "#10b981", // Using green color for live jobs to indicate "active"
+                "--tw-ring-opacity": "1",
+              }),
+            }}
             onClick={() => onReferenceSelect("live", liveJob)}
           >
             <div className="grid grid-cols-[56px_1fr_auto] gap-3 items-center">
@@ -267,10 +351,14 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
               <div
                 key={liveJob.id}
                 className={`border border-gray-200 rounded-xl bg-white p-3 shadow-lg cursor-pointer ${
-                  extJob?.id === liveJob.id
-                    ? "ring-2 ring-yellow-400 shadow-xl"
-                    : ""
+                  extJob?.id === liveJob.id ? "ring-2 shadow-xl" : ""
                 }`}
+                style={{
+                  ...(extJob?.id === liveJob.id && {
+                    "--tw-ring-color": "#10b981", // Using green color for live jobs to indicate "active"
+                    "--tw-ring-opacity": "1",
+                  }),
+                }}
                 onClick={() => onReferenceSelect("live", liveJob)}
               >
                 <div className="grid grid-cols-[56px_1fr_auto] gap-3 items-center">
@@ -404,8 +492,14 @@ function AISnapshotSection({ job, extJob, onReferenceSelect }) {
 
       <div
         className={`border border-gray-200 rounded-xl bg-white p-4 shadow-lg cursor-pointer ${
-          !extJob ? "ring-2 ring-yellow-400 shadow-xl" : ""
+          !extJob ? "ring-2 shadow-xl" : ""
         }`}
+        style={{
+          ...(!extJob && {
+            "--tw-ring-color": "#3b82f6", // Using blue color for AI snapshot
+            "--tw-ring-opacity": "1",
+          }),
+        }}
         onClick={() => onReferenceSelect("snapshot")}
       >
         <p className="text-xs text-gray-500 mb-4">
@@ -642,23 +736,14 @@ function StickyApplyFooter({ selectedContact }) {
   return (
     <div className="fixed left-0 right-0 bottom-0 z-50 bg-white border-t border-gray-200 p-3 shadow-lg">
       <div className="container max-w-screen-md mx-auto">
-        <div className="flex gap-2 mb-2">
-          <button className="flex-1 bg-gradient-to-b from-yellow-300 to-yellow-400 border border-yellow-300 text-yellow-900 font-black px-4 py-3 rounded-xl shadow-lg hover:from-yellow-400 hover:to-yellow-500 transition-all">
+        <div className="flex flex-col gap-2 mb-2">
+          <button className="flex-1 bg-gradient-to-b from-yellow-300 to-yellow-400 border border-yellow-300 text-yellow-900 font-black px-4 py-3 rounded-xl shadow-lg hover:from-yellow-400 hover:to-yellow-500 transition-all text-center">
             Apply now
           </button>
-          <span className="border border-gray-300 bg-gray-50 px-3 py-3 rounded-full text-xs">
+          <span className="border border-gray-300 bg-gray-50 py-2 rounded-full text-xs text-center">
             Selected: {selectedContact.initials} · {selectedContact.role} (
             {selectedContact.city})
           </span>
-        </div>
-        <div className="text-xs text-gray-500 text-center">
-          Next: checkout to unlock {selectedContact.initials} (
-          {selectedContact.role}) at {selectedContact.company}. We'll open your
-          message, pre-filled with subject + first line.
-        </div>
-        <div className="text-xs text-gray-500 text-center">
-          No account required · Verified ≤24h · 1 contact / 5 days · Bounce →
-          replacement
         </div>
       </div>
     </div>
@@ -792,6 +877,7 @@ const JobDetailsClient = ({ job }) => {
           <JobHeroSection job={job} contacts={contacts} liveJobs={liveJobs} />
 
           <ContactsSection
+            company={job.company}
             contacts={contacts}
             selectedContactId={selectedContactId}
             onContactSelect={handleContactSelect}
