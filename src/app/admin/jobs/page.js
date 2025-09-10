@@ -38,7 +38,7 @@ export default function AdminJobsPage() {
     employment_type: "",
     location: [],
     description: "",
-    chips: [], // Selected chip keys
+    chip_template_ids: [], // Selected chip template IDs
   });
 
   // Load jobs
@@ -121,13 +121,14 @@ export default function AdminJobsPage() {
       setSubmitting(true);
       setError(null);
 
-      // Prepare job data without chips
+      // Prepare job data including chip template IDs
       const jobData = {
         company_id: formData.company_id,
         title: formData.title,
         employment_type: formData.employment_type,
         location: formData.location,
         description: formData.description,
+        chip_template_ids: formData.chip_template_ids,
       };
 
       let response;
@@ -138,13 +139,6 @@ export default function AdminJobsPage() {
       }
 
       if (response.success) {
-        const jobId = editingJob ? editingJob.id : response.data.id;
-
-        // Handle chips separately
-        if (formData.chips && formData.chips.length > 0) {
-          await updateJobChips(jobId, formData.chips);
-        }
-
         setSuccess(
           editingJob ? "Job updated successfully" : "Job created successfully",
         );
@@ -161,34 +155,6 @@ export default function AdminJobsPage() {
     }
   };
 
-  // Update job chips
-  const updateJobChips = async (jobId, selectedChipKeys) => {
-    try {
-      // First, get all chip templates to map keys to labels
-      const allChips = Object.values(chipTemplates).flat();
-
-      // Clear existing chips and add new ones
-      const chipUpdates = selectedChipKeys
-        .map((chipKey, index) => {
-          const template = allChips.find((chip) => chip.chip_key === chipKey);
-          if (!template) return null;
-
-          return {
-            job_id: jobId,
-            chip_key: chipKey,
-            chip_label: template.chip_label,
-            display_order: index,
-          };
-        })
-        .filter(Boolean);
-
-      // Note: This would require a specific API endpoint for job chips
-      // For now, we'll store this info in the job description or handle it differently
-      // This is a simplified approach - in practice, you'd need specific endpoints
-    } catch (err) {
-      console.error("Update job chips error:", err);
-    }
-  };
 
   // Handle delete
   const handleDelete = async (job) => {
@@ -222,7 +188,7 @@ export default function AdminJobsPage() {
       employment_type: "",
       location: [],
       description: "",
-      chips: [],
+      chip_template_ids: [],
     });
     setEditingJob(null);
     setShowForm(false);
@@ -236,7 +202,7 @@ export default function AdminJobsPage() {
       employment_type: job.employment_type || "",
       location: Array.isArray(job.location) ? job.location : [],
       description: job.description || "",
-      chips: job.chips || [], // This would come from the API in a real implementation
+      chip_template_ids: job.chip_templates ? job.chip_templates.map(ct => ct.id) : [],
     });
     setEditingJob(job);
     setShowForm(true);
@@ -693,39 +659,32 @@ export default function AdminJobsPage() {
                               <div className="flex flex-wrap gap-2">
                                 {chips.map((chip) => (
                                   <button
-                                    key={chip.chip_key}
+                                    key={chip.id}
                                     type="button"
                                     onClick={() => {
                                       const isSelected =
-                                        formData.chips.includes(chip.chip_key);
+                                        formData.chip_template_ids.includes(chip.id);
                                       if (isSelected) {
                                         // Remove chip
                                         setFormData((prev) => ({
                                           ...prev,
-                                          chips: prev.chips.filter(
-                                            (key) => key !== chip.chip_key,
+                                          chip_template_ids: prev.chip_template_ids.filter(
+                                            (id) => id !== chip.id,
                                           ),
                                         }));
                                       } else {
                                         // Add chip
                                         setFormData((prev) => ({
                                           ...prev,
-                                          chips: [...prev.chips, chip.chip_key],
+                                          chip_template_ids: [...prev.chip_template_ids, chip.id],
                                         }));
                                       }
                                     }}
                                     className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                                      formData.chips.includes(chip.chip_key)
+                                      formData.chip_template_ids.includes(chip.id)
                                         ? "border-purple-300 bg-purple-100 text-purple-800 font-medium"
                                         : "border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100"
-                                    } ${
-                                      !formData.chips.includes(chip.chip_key)
-                                        ? "opacity-50 cursor-not-allowed"
-                                        : "cursor-pointer"
-                                    }`}
-                                    disabled={
-                                      !formData.chips.includes(chip.chip_key)
-                                    }
+                                    } cursor-pointer`}
                                     title={chip.description || chip.chip_label}
                                   >
                                     {chip.chip_label}
@@ -744,31 +703,31 @@ export default function AdminJobsPage() {
                       </div>
                     )}
 
-                    {formData.chips.length > 0 && (
+                    {formData.chip_template_ids.length > 0 && (
                       <div className="mt-3 p-3 bg-purple-50 rounded-lg">
                         <div className="text-sm font-medium text-purple-800 mb-2">
-                          Selected chips ({formData.chips.length}):
+                          Selected chips ({formData.chip_template_ids.length}):
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {formData.chips.map((chipKey) => {
+                          {formData.chip_template_ids.map((chipId) => {
                             const allChips =
                               Object.values(chipTemplates).flat();
                             const chip = allChips.find(
-                              (c) => c.chip_key === chipKey,
+                              (c) => c.id === chipId,
                             );
                             return (
                               <span
-                                key={chipKey}
+                                key={chipId}
                                 className="inline-flex items-center px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full"
                               >
-                                {chip?.chip_label || chipKey}
+                                {chip?.chip_label || `Chip ${chipId}`}
                                 <button
                                   type="button"
                                   onClick={() => {
                                     setFormData((prev) => ({
                                       ...prev,
-                                      chips: prev.chips.filter(
-                                        (key) => key !== chipKey,
+                                      chip_template_ids: prev.chip_template_ids.filter(
+                                        (id) => id !== chipId,
                                       ),
                                     }));
                                   }}

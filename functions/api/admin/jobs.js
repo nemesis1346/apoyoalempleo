@@ -15,10 +15,10 @@ export async function handleJobsRequest(method, jobId, request, env, user) {
     }`;
 
     // Try cache first for GET requests
-    const cached = await cache.get(request, cacheKey);
-    if (cached) {
-      return cached;
-    }
+    // const cached = await cache.get(request, cacheKey);
+    // if (cached) {
+    //   return cached;
+    // }
 
     // Get fresh data
     let response;
@@ -28,21 +28,23 @@ export async function handleJobsRequest(method, jobId, request, env, user) {
       response = await getJobs(env, user, url);
     }
 
-    // Cache successful responses with shorter TTL for admin data
-    if (response.status === 200) {
-      const cacheSettings = {
-        maxAge: 180, // 3 minutes browser cache
-        sMaxAge: 600, // 10 minutes edge cache
-        staleWhileRevalidate: 1200, // 20 minutes stale allowed
-        publicCache: false, // Private cache for admin data
-      };
-      response = await cache.put(request, response, {
-        ...cacheSettings,
-        customKey: cacheKey,
-      });
-    }
-
     return response;
+
+    // // Cache successful responses with shorter TTL for admin data
+    // if (response.status === 200) {
+    //   const cacheSettings = {
+    //     maxAge: 180, // 3 minutes browser cache
+    //     sMaxAge: 600, // 10 minutes edge cache
+    //     staleWhileRevalidate: 1200, // 20 minutes stale allowed
+    //     publicCache: false, // Private cache for admin data
+    //   };
+    //   response = await cache.put(request, response, {
+    //     ...cacheSettings,
+    //     customKey: cacheKey,
+    //   });
+    // }
+
+    // return response;
   }
 
   // Handle non-GET requests (with cache invalidation)
@@ -153,12 +155,100 @@ async function getJobs(env, user, url) {
 
     const { results } = await stmt.bind(...queryParams, limit, offset).all();
 
-    // Parse location JSON arrays in results
+    // Get chip templates for each job
+    const jobIds = results.map(job => job.id);
+    let chipTemplates = {};
+    
+    if (jobIds.length > 0) {
+      // Debug: Check what tables exist
+      try {
+        const tablesStmt = env.DB.prepare(`
+          SELECT name FROM sqlite_master WHERE type='table' AND (name='job_chip_templates' OR name='job_offer_chips')
+        `);
+        const { results: tables } = await tablesStmt.all();
+        console.log("Available tables:", tables.map(t => t.name));
+      } catch (e) {
+        console.log("Error checking tables:", e.message);
+      }
+
+      // Try to get chip templates - check if new table exists first
+      let chipResults = [];
+      try {
+        const chipStmt = env.DB.prepare(`
+          SELECT 
+            jct.job_id,
+            ct.id,
+            ct.chip_key,
+            ct.chip_label,
+            ct.category,
+            jct.display_order
+          FROM job_chip_templates jct
+          INNER JOIN chip_templates ct ON jct.chip_template_id = ct.id
+          WHERE jct.job_id IN (${jobIds.map(() => '?').join(',')})
+          ORDER BY jct.job_id, jct.display_order
+        `);
+        
+        const result = await chipStmt.bind(...jobIds).all();
+        chipResults = result.results || [];
+        console.log(`Found ${chipResults.length} chip templates from new table for jobs:`, jobIds);
+      } catch (error) {
+        console.log("New job_chip_templates table not available, trying old table:", error.message);
+        
+        // Fallback to old job_offer_chips table
+        try {
+          const oldChipStmt = env.DB.prepare(`
+            SELECT 
+              joc.job_id,
+              joc.chip_key,
+              joc.chip_label,
+              joc.display_order,
+              ct.id,
+              ct.category
+            FROM job_offer_chips joc
+            LEFT JOIN chip_templates ct ON joc.chip_key = ct.chip_key
+            WHERE joc.job_id IN (${jobIds.map(() => '?').join(',')}) AND joc.is_active = 1
+            ORDER BY joc.job_id, joc.display_order
+          `);
+          
+          const result = await oldChipStmt.bind(...jobIds).all();
+          chipResults = (result.results || []).map(chip => ({
+            job_id: chip.job_id,
+            id: chip.id || null,
+            chip_key: chip.chip_key,
+            chip_label: chip.chip_label,
+            category: chip.category || 'other',
+            display_order: chip.display_order
+          }));
+          console.log(`Found ${chipResults.length} chip templates from old table for jobs:`, jobIds);
+        } catch (fallbackError) {
+          console.error("Error fetching from old table:", fallbackError.message);
+        }
+      }
+      
+      // Process results
+      chipResults.forEach(chip => {
+        if (!chipTemplates[chip.job_id]) {
+          chipTemplates[chip.job_id] = [];
+        }
+        chipTemplates[chip.job_id].push({
+          id: chip.id,
+          chip_key: chip.chip_key,
+          chip_label: chip.chip_label,
+          category: chip.category,
+          display_order: chip.display_order
+        });
+      });
+      
+      console.log("Final chipTemplates object:", chipTemplates);
+    }
+
+    // Parse location JSON arrays in results and add chip templates
     const jobs = results.map((job) => {
       const { company_logo_url, company_color, company_name, ...jobItem } = job;
       return {
         ...jobItem,
         location: job.location ? JSON.parse(job.location) : [],
+        chip_templates: chipTemplates[job.id] || [],
         company: {
           name: company_name,
           logo_url: company_logo_url,
@@ -234,6 +324,21 @@ async function createJob(request, env, user) {
       }
     }
 
+    // Validate chip template IDs if provided
+    if (data.chip_template_ids && Array.isArray(data.chip_template_ids)) {
+      if (data.chip_template_ids.length > 0) {
+        const chipTemplateStmt = env.DB.prepare(`
+          SELECT COUNT(*) as count FROM chip_templates 
+          WHERE id IN (${data.chip_template_ids.map(() => '?').join(',')}) AND is_active = 1
+        `);
+        const { count } = await chipTemplateStmt.bind(...data.chip_template_ids).first();
+        
+        if (count !== data.chip_template_ids.length) {
+          return createResponse({ error: "One or more chip templates are invalid or inactive" }, 400);
+        }
+      }
+    }
+
     const stmt = env.DB.prepare(`
       INSERT INTO jobs (company_id, title, employment_type, location, description)
       VALUES (?, ?, ?, ?, ?)
@@ -249,11 +354,18 @@ async function createJob(request, env, user) {
       )
       .run();
 
+    const jobId = result.meta.last_row_id;
+
+    // Handle chip templates
+    if (data.chip_template_ids && Array.isArray(data.chip_template_ids) && data.chip_template_ids.length > 0) {
+      await updateJobChipTemplates(env, jobId, data.chip_template_ids);
+    }
+
     return createResponse(
       {
         success: true,
         data: {
-          id: result.meta.last_row_id,
+          id: jobId,
           ...data,
           location: data.location || [],
         },
@@ -292,9 +404,62 @@ async function getJob(jobId, env, user) {
       return createResponse({ error: "Access denied" }, 403);
     }
 
+    // Get chip templates for this job
+    let chipResults = [];
+    try {
+      const chipStmt = env.DB.prepare(`
+        SELECT 
+          ct.id,
+          ct.chip_key,
+          ct.chip_label,
+          ct.category,
+          jct.display_order
+        FROM job_chip_templates jct
+        INNER JOIN chip_templates ct ON jct.chip_template_id = ct.id
+        WHERE jct.job_id = ?
+        ORDER BY jct.display_order
+      `);
+      
+      const result = await chipStmt.bind(jobId).all();
+      chipResults = result.results || [];
+      console.log(`Found ${chipResults.length} chip templates from new table for job ${jobId}`);
+    } catch (error) {
+      console.log("New job_chip_templates table not available, trying old table:", error.message);
+      
+      // Fallback to old job_offer_chips table
+      try {
+        const oldChipStmt = env.DB.prepare(`
+          SELECT 
+            joc.chip_key,
+            joc.chip_label,
+            joc.display_order,
+            ct.id,
+            ct.category
+          FROM job_offer_chips joc
+          LEFT JOIN chip_templates ct ON joc.chip_key = ct.chip_key
+          WHERE joc.job_id = ? AND joc.is_active = 1
+          ORDER BY joc.display_order
+        `);
+        
+        const result = await oldChipStmt.bind(jobId).all();
+        chipResults = (result.results || []).map(chip => ({
+          id: chip.id || null,
+          chip_key: chip.chip_key,
+          chip_label: chip.chip_label,
+          category: chip.category || 'other',
+          display_order: chip.display_order
+        }));
+        console.log(`Found ${chipResults.length} chip templates from old table for job ${jobId}`);
+      } catch (fallbackError) {
+        console.error("Error fetching from old table:", fallbackError.message);
+        chipResults = [];
+      }
+    }
+
     // Parse location JSON array
     const { company_logo_url, company_color, company_name, ...jobItem } = job;
     job.location = job.location ? JSON.parse(job.location) : [];
+    job.chip_templates = chipResults || [];
     job.company = {
       name: company_name,
       logo_url: company_logo_url,
@@ -372,6 +537,21 @@ async function updateJob(jobId, request, env, user) {
       }
     }
 
+    // Validate chip template IDs if provided
+    if (data.chip_template_ids && Array.isArray(data.chip_template_ids)) {
+      if (data.chip_template_ids.length > 0) {
+        const chipTemplateStmt = env.DB.prepare(`
+          SELECT COUNT(*) as count FROM chip_templates 
+          WHERE id IN (${data.chip_template_ids.map(() => '?').join(',')})
+        `);
+        const { count } = await chipTemplateStmt.bind(...data.chip_template_ids).first();
+        
+        if (count !== data.chip_template_ids.length) {
+          return createResponse({ error: "One or more chip templates are invalid or inactive" }, 400);
+        }
+      }
+    }
+
     const stmt = env.DB.prepare(`
       UPDATE jobs 
       SET title = ?, employment_type = ?, location = ?, description = ?, updated_at = datetime('now')
@@ -390,6 +570,11 @@ async function updateJob(jobId, request, env, user) {
 
     if (result.changes === 0) {
       return createResponse({ error: "Job not found" }, 404);
+    }
+
+    // Handle chip templates update
+    if (data.chip_template_ids !== undefined) {
+      await updateJobChipTemplates(env, jobId, data.chip_template_ids || []);
     }
 
     return createResponse({
@@ -453,6 +638,33 @@ async function deleteJob(jobId, env, user) {
       },
       500,
     );
+  }
+}
+
+// Helper function to update job chip templates
+async function updateJobChipTemplates(env, jobId, chipTemplateIds) {
+  try {
+    // Remove existing chip templates for this job
+    const deleteStmt = env.DB.prepare(`
+      DELETE FROM job_chip_templates WHERE job_id = ?
+    `);
+    await deleteStmt.bind(jobId).run();
+
+    // Add new chip templates if any
+    if (chipTemplateIds && chipTemplateIds.length > 0) {
+      const insertStmt = env.DB.prepare(`
+        INSERT INTO job_chip_templates (job_id, chip_template_id, display_order)
+        VALUES (?, ?, ?)
+      `);
+
+      // Insert each chip template with display order
+      for (let i = 0; i < chipTemplateIds.length; i++) {
+        await insertStmt.bind(jobId, chipTemplateIds[i], i).run();
+      }
+    }
+  } catch (error) {
+    console.error("Update job chip templates error:", error);
+    throw error;
   }
 }
 
