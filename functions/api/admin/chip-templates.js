@@ -32,21 +32,23 @@ export async function handleChipTemplatesRequest(
       response = await getChipTemplates(env, user, url);
     }
 
-    // Cache successful responses with longer TTL for templates
-    if (response.status === 200) {
-      const cacheSettings = {
-        maxAge: 600, // 10 minutes browser cache
-        sMaxAge: 3600, // 1 hour edge cache
-        staleWhileRevalidate: 7200, // 2 hours stale allowed
-        publicCache: false, // Private cache for admin data
-      };
-      response = await cache.put(request, response, {
-        ...cacheSettings,
-        customKey: cacheKey,
-      });
-    }
-
     return response;
+
+    // // Cache successful responses with longer TTL for templates
+    // if (response.status === 200) {
+    //   const cacheSettings = {
+    //     maxAge: 600, // 10 minutes browser cache
+    //     sMaxAge: 3600, // 1 hour edge cache
+    //     staleWhileRevalidate: 7200, // 2 hours stale allowed
+    //     publicCache: false, // Private cache for admin data
+    //   };
+    //   response = await cache.put(request, response, {
+    //     ...cacheSettings,
+    //     customKey: cacheKey,
+    //   });
+    // }
+
+    // return response;
   }
 
   // Handle non-GET requests (with cache invalidation)
@@ -118,9 +120,9 @@ async function getChipTemplates(env, user, url) {
       queryParams.push(category);
     }
 
-    // Only active templates
-    whereConditions.push("is_active = ?");
-    queryParams.push(true);
+    // // Only active templates
+    // whereConditions.push("is_active = ?");
+    // queryParams.push(true);
 
     const whereClause =
       whereConditions.length > 0

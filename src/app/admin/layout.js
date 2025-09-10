@@ -89,7 +89,7 @@ export default function AdminLayout({ children }) {
   );
 
   return (
-    <div className="bg-gray-50 flex max-h-screen">
+    <div className="bg-gray-50 flex max-h-screen min-h-screen">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div

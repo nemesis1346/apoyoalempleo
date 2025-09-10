@@ -34,21 +34,23 @@ export async function handleAISnapshotsRequest(
       response = await getAISnapshots(env, user, url);
     }
 
-    // Cache successful responses with longer TTL for AI snapshots
-    if (response.status === 200) {
-      const cacheSettings = {
-        maxAge: 300, // 5 minutes browser cache
-        sMaxAge: 1800, // 30 minutes edge cache
-        staleWhileRevalidate: 3600, // 1 hour stale allowed
-        publicCache: false, // Private cache for admin data
-      };
-      response = await cache.put(request, response, {
-        ...cacheSettings,
-        customKey: cacheKey,
-      });
-    }
-
     return response;
+
+    // // Cache successful responses with longer TTL for AI snapshots
+    // if (response.status === 200) {
+    //   const cacheSettings = {
+    //     maxAge: 300, // 5 minutes browser cache
+    //     sMaxAge: 1800, // 30 minutes edge cache
+    //     staleWhileRevalidate: 3600, // 1 hour stale allowed
+    //     publicCache: false, // Private cache for admin data
+    //   };
+    //   response = await cache.put(request, response, {
+    //     ...cacheSettings,
+    //     customKey: cacheKey,
+    //   });
+    // }
+
+    // return response;
   }
 
   // Handle non-GET requests (with cache invalidation)
@@ -138,9 +140,9 @@ async function getAISnapshots(env, user, url) {
       queryParams.push(employment_type);
     }
 
-    // Only active snapshots
-    whereConditions.push("is_active = ?");
-    queryParams.push(true);
+    // // Only active snapshots
+    // whereConditions.push("is_active = ?");
+    // queryParams.push(true);
 
     const whereClause =
       whereConditions.length > 0
@@ -205,7 +207,10 @@ async function getAISnapshots(env, user, url) {
     });
   } catch (error) {
     console.error("Get AI snapshots error:", error);
-    return createResponse({ error: "Failed to fetch AI snapshots" }, 500);
+    return createResponse(
+      { error: "Failed to fetch AI snapshots", data: error },
+      500,
+    );
   }
 }
 

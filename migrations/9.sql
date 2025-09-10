@@ -24,16 +24,6 @@ CREATE TABLE IF NOT EXISTS chip_templates (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO chip_templates (chip_key, chip_label, category, description) VALUES
-('nights', 'night shifts', 'availability', 'Willingness to work night shifts'),
-('start', 'start immediately', 'availability', 'Available to start work immediately'),
-('cctv', 'CCTV monitoring', 'skills', 'Experience with CCTV monitoring systems'),
-('license', 'security license (valid)', 'certifications', 'Valid security license'),
-('motorcycle', 'motorcycle (A2)', 'certifications', 'A2 motorcycle license'),
-('customer', 'customer service', 'skills', 'Customer service experience'),
-('nearby', 'live nearby', 'location', 'Lives close to the job location'),
-('firstaid', 'first aid course', 'certifications', 'Completed first aid training course');
-
 CREATE INDEX IF NOT EXISTS idx_job_offer_chips_job_id ON job_offer_chips(job_id);
 CREATE INDEX IF NOT EXISTS idx_job_offer_chips_active ON job_offer_chips(is_active);
 CREATE INDEX IF NOT EXISTS idx_job_offer_chips_display_order ON job_offer_chips(job_id, display_order);

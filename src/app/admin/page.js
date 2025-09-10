@@ -251,6 +251,60 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </Link>
+            <Link
+              href="/admin/child-jobs"
+              className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:shadow-sm transition-all duration-150 group"
+            >
+              <div className="flex items-center">
+                <div className="p-2 bg-cyan-100 rounded-lg group-hover:bg-cyan-200 transition-colors">
+                  <span className="text-xl">🔗</span>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-gray-900">
+                    Manage Child Jobs
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Create and update child jobs
+                  </p>
+                </div>
+              </div>
+            </Link>
+            <Link
+              href="/admin/ai-snapshots"
+              className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:shadow-sm transition-all duration-150 group"
+            >
+              <div className="flex items-center">
+                <div className="p-2 bg-indigo-100 rounded-lg group-hover:bg-indigo-200 transition-colors">
+                  <span className="text-xl">🤖</span>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-gray-900">
+                    Manage AI Snapshots
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Create and update AI snapshots
+                  </p>
+                </div>
+              </div>
+            </Link>
+            <Link
+              href="/admin/chip-templates"
+              className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:shadow-sm transition-all duration-150 group"
+            >
+              <div className="flex items-center">
+                <div className="p-2 bg-pink-100 rounded-lg group-hover:bg-pink-200 transition-colors">
+                  <span className="text-xl">🏷️</span>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-gray-900">
+                    Manage Chip Templates
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Create and update chip templates
+                  </p>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
       </div>

@@ -464,7 +464,7 @@ export default function AdminJobsPage() {
                         </td>
                         {user?.role === "super_admin" && (
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {job.company_name || "-"}
+                            {job.company?.name || "-"}
                           </td>
                         )}
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -707,16 +707,11 @@ export default function AdminJobsPage() {
                                           ),
                                         }));
                                       } else {
-                                        // Add chip (limit to 3)
-                                        if (formData.chips.length < 3) {
-                                          setFormData((prev) => ({
-                                            ...prev,
-                                            chips: [
-                                              ...prev.chips,
-                                              chip.chip_key,
-                                            ],
-                                          }));
-                                        }
+                                        // Add chip
+                                        setFormData((prev) => ({
+                                          ...prev,
+                                          chips: [...prev.chips, chip.chip_key],
+                                        }));
                                       }
                                     }}
                                     className={`px-3 py-1 text-xs rounded-full border transition-colors ${
@@ -724,13 +719,11 @@ export default function AdminJobsPage() {
                                         ? "border-purple-300 bg-purple-100 text-purple-800 font-medium"
                                         : "border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100"
                                     } ${
-                                      formData.chips.length >= 3 &&
                                       !formData.chips.includes(chip.chip_key)
                                         ? "opacity-50 cursor-not-allowed"
                                         : "cursor-pointer"
                                     }`}
                                     disabled={
-                                      formData.chips.length >= 3 &&
                                       !formData.chips.includes(chip.chip_key)
                                     }
                                     title={chip.description || chip.chip_label}
@@ -754,10 +747,10 @@ export default function AdminJobsPage() {
                     {formData.chips.length > 0 && (
                       <div className="mt-3 p-3 bg-purple-50 rounded-lg">
                         <div className="text-sm font-medium text-purple-800 mb-2">
-                          Selected chips ({formData.chips.length}/3):
+                          Selected chips ({formData.chips.length}):
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {formData.chips.map((chipKey, index) => {
+                          {formData.chips.map((chipKey) => {
                             const allChips =
                               Object.values(chipTemplates).flat();
                             const chip = allChips.find(
