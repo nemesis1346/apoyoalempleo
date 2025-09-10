@@ -132,6 +132,166 @@ export const adminService = {
     },
   },
 
+  // Child Jobs Management
+  childJobs: {
+    /**
+     * Get all child jobs (admin view)
+     */
+    getAll: async (params = {}) => {
+      const queryParams = new URLSearchParams();
+
+      if (params.page) queryParams.append("page", params.page);
+      if (params.limit) queryParams.append("limit", params.limit);
+      if (params.search) queryParams.append("search", params.search);
+      if (params.parent_job_id)
+        queryParams.append("parent_job_id", params.parent_job_id);
+      if (params.source) queryParams.append("source", params.source);
+      if (params.country) queryParams.append("country", params.country);
+
+      const queryString = queryParams.toString();
+      const url = `/admin/child-jobs${queryString ? `?${queryString}` : ""}`;
+
+      return await api.get(url);
+    },
+
+    /**
+     * Get single child job by ID
+     */
+    getById: async (id) => {
+      return await api.get(`/admin/child-jobs/${id}`);
+    },
+
+    /**
+     * Create new child job
+     */
+    create: async (data) => {
+      return await api.post("/admin/child-jobs", data);
+    },
+
+    /**
+     * Update existing child job
+     */
+    update: async (id, data) => {
+      return await api.put(`/admin/child-jobs/${id}`, data);
+    },
+
+    /**
+     * Delete child job
+     */
+    delete: async (id) => {
+      return await api.delete(`/admin/child-jobs/${id}`);
+    },
+  },
+
+  // AI Snapshots Management
+  aiSnapshots: {
+    /**
+     * Get all AI snapshots (admin view)
+     */
+    getAll: async (params = {}) => {
+      const queryParams = new URLSearchParams();
+
+      if (params.page) queryParams.append("page", params.page);
+      if (params.limit) queryParams.append("limit", params.limit);
+      if (params.search) queryParams.append("search", params.search);
+      if (params.job_title) queryParams.append("job_title", params.job_title);
+      if (params.city) queryParams.append("city", params.city);
+      if (params.country) queryParams.append("country", params.country);
+      if (params.employment_type)
+        queryParams.append("employment_type", params.employment_type);
+
+      const queryString = queryParams.toString();
+      const url = `/admin/ai-snapshots${queryString ? `?${queryString}` : ""}`;
+
+      return await api.get(url);
+    },
+
+    /**
+     * Get single AI snapshot by ID
+     */
+    getById: async (id) => {
+      return await api.get(`/admin/ai-snapshots/${id}`);
+    },
+
+    /**
+     * Create new AI snapshot
+     */
+    create: async (data) => {
+      return await api.post("/admin/ai-snapshots", data);
+    },
+
+    /**
+     * Update existing AI snapshot
+     */
+    update: async (id, data) => {
+      return await api.put(`/admin/ai-snapshots/${id}`, data);
+    },
+
+    /**
+     * Delete AI snapshot
+     */
+    delete: async (id) => {
+      return await api.delete(`/admin/ai-snapshots/${id}`);
+    },
+  },
+
+  // Chip Templates Management
+  chipTemplates: {
+    /**
+     * Get all chip templates (admin view)
+     */
+    getAll: async (params = {}) => {
+      const queryParams = new URLSearchParams();
+
+      if (params.page) queryParams.append("page", params.page);
+      if (params.limit) queryParams.append("limit", params.limit);
+      if (params.search) queryParams.append("search", params.search);
+      if (params.category) queryParams.append("category", params.category);
+
+      const queryString = queryParams.toString();
+      const url = `/admin/chip-templates${
+        queryString ? `?${queryString}` : ""
+      }`;
+
+      return await api.get(url);
+    },
+
+    /**
+     * Get chip templates grouped by category
+     */
+    getByCategory: async () => {
+      return await api.get("/admin/chip-templates/categories");
+    },
+
+    /**
+     * Get single chip template by ID
+     */
+    getById: async (id) => {
+      return await api.get(`/admin/chip-templates/${id}`);
+    },
+
+    /**
+     * Create new chip template
+     */
+    create: async (data) => {
+      return await api.post("/admin/chip-templates", data);
+    },
+
+    /**
+     * Update existing chip template
+     */
+    update: async (id, data) => {
+      return await api.put(`/admin/chip-templates/${id}`, data);
+    },
+
+    /**
+     * Delete chip template
+     */
+    delete: async (id) => {
+      return await api.delete(`/admin/chip-templates/${id}`);
+    },
+  },
+
   // Contacts Management
   contacts: {
     /**

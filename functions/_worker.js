@@ -21,6 +21,7 @@ import { handleAdminRequest } from "./api/admin/index.js";
 import { handleAttributesRequest } from "./api/attributes/index.js";
 import { handleUploadRequest } from "./api/upload.js";
 import { handleContactsRequest } from "./api/contacts/index.js";
+import { handleJobsRequest } from "./api/jobs/index.js";
 
 // Utilities
 import { handleCORS, createResponse } from "./utils/cors.js";
@@ -57,10 +58,16 @@ export default {
           return response;
         }
 
-        // Companies routes (public - highly cacheable)
+        // Attributes routes (public - highly cacheable)
         if (path.startsWith("/api/attributes")) {
           // Cache logic is handled inside handleAttributesRequest
           return await handleAttributesRequest(request, env);
+        }
+
+        // Jobs routes (public - highly cacheable)
+        if (path.startsWith("/api/jobs")) {
+          // Cache logic is handled inside handleJobsRequest
+          return await handleJobsRequest(request, env);
         }
 
         // Protected routes - require authentication

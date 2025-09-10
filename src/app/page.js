@@ -11,7 +11,7 @@ function HeroSection() {
       <div className="absolute left-0 right-0 top-0 h-32 z-0 bg-gradient-to-b from-yellow-400 via-yellow-300 to-yellow-100 opacity-90 border-b border-yellow-300"></div>
 
       <div className="relative z-10">
-        <div className="inline-flex gap-2 items-center bg-white border border-yellow-300 rounded-xl px-3 py-2 font-bold text-yellow-900 shadow-md mb-2">
+        <div className="inline-flex gap-2 items-center bg-white border border-yellow-300 rounded-xl p-2 md:p-4: font-bold text-yellow-900 shadow-md mb-2">
           <span>🚀</span>
           <span className="font-black">Access now</span>
           <span>·</span>
@@ -302,9 +302,9 @@ function StickyCTAFooter() {
 // Main Component
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-2 text-gray-600 text-sm pb-28 md:pb-18">
-      <div className="container max-w-screen-md mx-auto py-2">
-        <div className="bg-white shadow-lg overflow-hidden py-4 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-2 md:px-4 text-gray-600 text-sm pb-26 md:pb-18">
+      <div className="container max-w-screen-md mx-auto py-2 md:py-4">
+        <div className="bg-white shadow-lg overflow-hidden p-2 md:p-4">
           <HeroSection />
 
           <TestimonialsSection />

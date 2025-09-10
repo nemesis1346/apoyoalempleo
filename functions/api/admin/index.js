@@ -3,6 +3,9 @@ import { createResponse, addCorsHeaders } from "../../utils/cors.js";
 import { handleCompaniesRequest } from "./companies.js";
 import { handleJobsRequest } from "./jobs.js";
 import { handleContactsRequest } from "./contacts.js";
+import { handleChildJobsRequest } from "./child-jobs.js";
+import { handleAISnapshotsRequest } from "./ai-snapshots.js";
+import { handleChipTemplatesRequest } from "./chip-templates.js";
 
 export async function handleAdminRequest(request, env) {
   const url = new URL(request.url);
@@ -47,6 +50,33 @@ export async function handleAdminRequest(request, env) {
           user,
         );
         break;
+      case "child-jobs":
+        response = await handleChildJobsRequest(
+          method,
+          resourceId,
+          request,
+          env,
+          user,
+        );
+        break;
+      case "ai-snapshots":
+        response = await handleAISnapshotsRequest(
+          method,
+          resourceId,
+          request,
+          env,
+          user,
+        );
+        break;
+      case "chip-templates":
+        response = await handleChipTemplatesRequest(
+          method,
+          resourceId,
+          request,
+          env,
+          user,
+        );
+        break;
       case "contacts":
         response = await handleContactsRequest(
           method,
@@ -77,26 +107,61 @@ async function handleStats(method, request, env, user) {
   }
 
   try {
-    let companiesCount, jobsCount, contactsCount, usersCount;
+    let companiesCount,
+      jobsCount,
+      childJobsCount,
+      aiSnapshotsCount,
+      chipTemplatesCount,
+      contactsCount,
+      usersCount;
 
     if (user.role === "super_admin") {
       // Super admin sees all stats
-      const [companies, jobs, contacts, users] = await Promise.all([
+      const [
+        companies,
+        jobs,
+        childJobs,
+        aiSnapshots,
+        chipTemplates,
+        contacts,
+        users,
+      ] = await Promise.all([
         env.DB.prepare("SELECT COUNT(*) as count FROM companies").first(),
         env.DB.prepare("SELECT COUNT(*) as count FROM jobs").first(),
+        env.DB.prepare(
+          "SELECT COUNT(*) as count FROM child_jobs WHERE is_active = 1",
+        ).first(),
+        env.DB.prepare(
+          "SELECT COUNT(*) as count FROM ai_snapshots WHERE is_active = 1",
+        ).first(),
+        env.DB.prepare(
+          "SELECT COUNT(*) as count FROM chip_templates WHERE is_active = 1",
+        ).first(),
         env.DB.prepare("SELECT COUNT(*) as count FROM contacts").first(),
         env.DB.prepare("SELECT COUNT(*) as count FROM users").first(),
       ]);
 
       companiesCount = companies.count;
       jobsCount = jobs.count;
+      childJobsCount = childJobs.count;
+      aiSnapshotsCount = aiSnapshots.count;
+      chipTemplatesCount = chipTemplates.count;
       contactsCount = contacts.count;
       usersCount = users.count;
     } else {
       // Company admin sees only their company stats
-      const [jobs, contacts] = await Promise.all([
+      const [jobs, childJobs, contacts] = await Promise.all([
         env.DB.prepare(
           "SELECT COUNT(*) as count FROM jobs WHERE company_id = ?",
+        )
+          .bind(user.company_id)
+          .first(),
+        env.DB.prepare(
+          `
+          SELECT COUNT(*) as count FROM child_jobs cj
+          LEFT JOIN jobs j ON cj.parent_job_id = j.id
+          WHERE j.company_id = ? AND cj.is_active = 1
+        `,
         )
           .bind(user.company_id)
           .first(),
@@ -107,8 +172,21 @@ async function handleStats(method, request, env, user) {
           .first(),
       ]);
 
+      // AI snapshots and chip templates are global, so all admins can see them
+      const [aiSnapshots, chipTemplates] = await Promise.all([
+        env.DB.prepare(
+          "SELECT COUNT(*) as count FROM ai_snapshots WHERE is_active = 1",
+        ).first(),
+        env.DB.prepare(
+          "SELECT COUNT(*) as count FROM chip_templates WHERE is_active = 1",
+        ).first(),
+      ]);
+
       companiesCount = 1; // Their own company
       jobsCount = jobs.count;
+      childJobsCount = childJobs.count;
+      aiSnapshotsCount = aiSnapshots.count;
+      chipTemplatesCount = chipTemplates.count;
       contactsCount = contacts.count;
       usersCount = 0; // Company admins can't see user stats
     }
@@ -116,6 +194,9 @@ async function handleStats(method, request, env, user) {
     return createResponse({
       companies: companiesCount,
       jobs: jobsCount,
+      childJobs: childJobsCount,
+      aiSnapshots: aiSnapshotsCount,
+      chipTemplates: chipTemplatesCount,
       contacts: contactsCount,
       users: usersCount,
     });

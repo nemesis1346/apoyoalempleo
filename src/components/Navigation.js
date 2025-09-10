@@ -39,7 +39,7 @@ export default function Navigation() {
   }, [pathname]);
 
   return (
-    <nav className="bg-[#B276CA] shadow-lg sticky top-0 z-50 backdrop-blur-sm px-4">
+    <nav className="bg-[#B276CA] shadow-lg sticky top-0 z-50 backdrop-blur-sm px-2 md:px-4">
       <div className="container max-w-screen-md mx-auto py-2">
         <div className="flex justify-between items-center h-14">
           {/* Desktop Navigation */}

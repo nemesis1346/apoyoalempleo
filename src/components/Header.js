@@ -45,7 +45,7 @@ export default function Header() {
 
   return (
     <>
-      <div className="bg-[#5E3FA6] px-4 py-2">
+      <div className="bg-[#5E3FA6] px-2 md:px-4 py-2">
         <div className="container max-w-screen-md mx-auto py-2 flex justify-between items-center">
           {/* Logo */}
           <Link href="/">

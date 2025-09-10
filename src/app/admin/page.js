@@ -10,6 +10,9 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({
     companies: 0,
     jobs: 0,
+    childJobs: 0,
+    aiSnapshots: 0,
+    chipTemplates: 0,
     contacts: 0,
     users: 0,
   });
@@ -29,6 +32,9 @@ export default function AdminDashboard() {
         setStats({
           companies: response.companies || 0,
           jobs: response.jobs || 0,
+          childJobs: response.childJobs || 0,
+          aiSnapshots: response.aiSnapshots || 0,
+          chipTemplates: response.chipTemplates || 0,
           contacts: response.contacts || 0,
           users: response.users || 0,
         });
@@ -72,6 +78,27 @@ export default function AdminDashboard() {
       value: stats.jobs,
       icon: "💼",
       color: "bg-green-500",
+      show: true,
+    },
+    {
+      name: "Child Jobs",
+      value: stats.childJobs,
+      icon: "🔗",
+      color: "bg-cyan-500",
+      show: true,
+    },
+    {
+      name: "AI Snapshots",
+      value: stats.aiSnapshots,
+      icon: "🤖",
+      color: "bg-indigo-500",
+      show: true,
+    },
+    {
+      name: "Chip Templates",
+      value: stats.chipTemplates,
+      icon: "🏷️",
+      color: "bg-pink-500",
       show: true,
     },
     {

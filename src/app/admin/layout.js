@@ -53,6 +53,24 @@ export default function AdminLayout({ children }) {
       roles: ["super_admin", "company_admin"],
     },
     {
+      name: "Child Jobs",
+      href: "/admin/child-jobs",
+      icon: "🔗",
+      roles: ["super_admin", "company_admin"],
+    },
+    {
+      name: "AI Snapshots",
+      href: "/admin/ai-snapshots",
+      icon: "🤖",
+      roles: ["super_admin", "company_admin"],
+    },
+    {
+      name: "Chip Templates",
+      href: "/admin/chip-templates",
+      icon: "🏷️",
+      roles: ["super_admin", "company_admin"],
+    },
+    {
       name: "Contacts",
       href: "/admin/contacts",
       icon: "📞",

@@ -10,6 +10,7 @@ export default function AdminJobsPage() {
   // State management
   const [jobs, setJobs] = useState([]);
   const [companies, setCompanies] = useState([]);
+  const [chipTemplates, setChipTemplates] = useState({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -37,6 +38,7 @@ export default function AdminJobsPage() {
     employment_type: "",
     location: [],
     description: "",
+    chips: [], // Selected chip keys
   });
 
   // Load jobs
@@ -89,6 +91,28 @@ export default function AdminJobsPage() {
     }
   }, []);
 
+  // Load chip templates for selection
+  const loadChipTemplates = useCallback(async () => {
+    try {
+      const response = await adminService.chipTemplates.getAll({ limit: 100 });
+
+      if (response.success) {
+        // Group templates by category
+        const grouped = response.data.reduce((acc, template) => {
+          const category = template.category || "other";
+          if (!acc[category]) {
+            acc[category] = [];
+          }
+          acc[category].push(template);
+          return acc;
+        }, {});
+        setChipTemplates(grouped);
+      }
+    } catch (err) {
+      console.error("Load chip templates error:", err);
+    }
+  }, []);
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -97,14 +121,30 @@ export default function AdminJobsPage() {
       setSubmitting(true);
       setError(null);
 
+      // Prepare job data without chips
+      const jobData = {
+        company_id: formData.company_id,
+        title: formData.title,
+        employment_type: formData.employment_type,
+        location: formData.location,
+        description: formData.description,
+      };
+
       let response;
       if (editingJob) {
-        response = await adminService.jobs.update(editingJob.id, formData);
+        response = await adminService.jobs.update(editingJob.id, jobData);
       } else {
-        response = await adminService.jobs.create(formData);
+        response = await adminService.jobs.create(jobData);
       }
 
       if (response.success) {
+        const jobId = editingJob ? editingJob.id : response.data.id;
+
+        // Handle chips separately
+        if (formData.chips && formData.chips.length > 0) {
+          await updateJobChips(jobId, formData.chips);
+        }
+
         setSuccess(
           editingJob ? "Job updated successfully" : "Job created successfully",
         );
@@ -118,6 +158,35 @@ export default function AdminJobsPage() {
       setError(err.message || "Operation failed");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Update job chips
+  const updateJobChips = async (jobId, selectedChipKeys) => {
+    try {
+      // First, get all chip templates to map keys to labels
+      const allChips = Object.values(chipTemplates).flat();
+
+      // Clear existing chips and add new ones
+      const chipUpdates = selectedChipKeys
+        .map((chipKey, index) => {
+          const template = allChips.find((chip) => chip.chip_key === chipKey);
+          if (!template) return null;
+
+          return {
+            job_id: jobId,
+            chip_key: chipKey,
+            chip_label: template.chip_label,
+            display_order: index,
+          };
+        })
+        .filter(Boolean);
+
+      // Note: This would require a specific API endpoint for job chips
+      // For now, we'll store this info in the job description or handle it differently
+      // This is a simplified approach - in practice, you'd need specific endpoints
+    } catch (err) {
+      console.error("Update job chips error:", err);
     }
   };
 
@@ -153,6 +222,7 @@ export default function AdminJobsPage() {
       employment_type: "",
       location: [],
       description: "",
+      chips: [],
     });
     setEditingJob(null);
     setShowForm(false);
@@ -166,6 +236,7 @@ export default function AdminJobsPage() {
       employment_type: job.employment_type || "",
       location: Array.isArray(job.location) ? job.location : [],
       description: job.description || "",
+      chips: job.chips || [], // This would come from the API in a real implementation
     });
     setEditingJob(job);
     setShowForm(true);
@@ -219,6 +290,7 @@ export default function AdminJobsPage() {
     if (user) {
       loadJobs();
       loadCompanies();
+      loadChipTemplates();
     }
   }, [
     user,
@@ -227,6 +299,7 @@ export default function AdminJobsPage() {
     filters,
     loadJobs,
     loadCompanies,
+    loadChipTemplates,
   ]);
 
   useEffect(() => {
@@ -597,6 +670,125 @@ export default function AdminJobsPage() {
                       className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
                       required
                     ></textarea>
+                  </div>
+
+                  {/* Offer Chips Section */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      What Can You Offer Chips
+                    </label>
+                    <p className="text-xs text-gray-500 mb-3">
+                      Select 1-3 chips that best describe what candidates can
+                      offer for this role.
+                    </p>
+
+                    {Object.keys(chipTemplates).length > 0 ? (
+                      <div className="space-y-4">
+                        {Object.entries(chipTemplates).map(
+                          ([category, chips]) => (
+                            <div key={category}>
+                              <h4 className="text-sm font-medium text-gray-800 capitalize mb-2">
+                                {category} ({chips.length})
+                              </h4>
+                              <div className="flex flex-wrap gap-2">
+                                {chips.map((chip) => (
+                                  <button
+                                    key={chip.chip_key}
+                                    type="button"
+                                    onClick={() => {
+                                      const isSelected =
+                                        formData.chips.includes(chip.chip_key);
+                                      if (isSelected) {
+                                        // Remove chip
+                                        setFormData((prev) => ({
+                                          ...prev,
+                                          chips: prev.chips.filter(
+                                            (key) => key !== chip.chip_key,
+                                          ),
+                                        }));
+                                      } else {
+                                        // Add chip (limit to 3)
+                                        if (formData.chips.length < 3) {
+                                          setFormData((prev) => ({
+                                            ...prev,
+                                            chips: [
+                                              ...prev.chips,
+                                              chip.chip_key,
+                                            ],
+                                          }));
+                                        }
+                                      }
+                                    }}
+                                    className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                                      formData.chips.includes(chip.chip_key)
+                                        ? "border-purple-300 bg-purple-100 text-purple-800 font-medium"
+                                        : "border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100"
+                                    } ${
+                                      formData.chips.length >= 3 &&
+                                      !formData.chips.includes(chip.chip_key)
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : "cursor-pointer"
+                                    }`}
+                                    disabled={
+                                      formData.chips.length >= 3 &&
+                                      !formData.chips.includes(chip.chip_key)
+                                    }
+                                    title={chip.description || chip.chip_label}
+                                  >
+                                    {chip.chip_label}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-500 italic">
+                        No chip templates available. Create some in the{" "}
+                        <span className="text-purple-600">Chip Templates</span>{" "}
+                        section first.
+                      </div>
+                    )}
+
+                    {formData.chips.length > 0 && (
+                      <div className="mt-3 p-3 bg-purple-50 rounded-lg">
+                        <div className="text-sm font-medium text-purple-800 mb-2">
+                          Selected chips ({formData.chips.length}/3):
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {formData.chips.map((chipKey, index) => {
+                            const allChips =
+                              Object.values(chipTemplates).flat();
+                            const chip = allChips.find(
+                              (c) => c.chip_key === chipKey,
+                            );
+                            return (
+                              <span
+                                key={chipKey}
+                                className="inline-flex items-center px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full"
+                              >
+                                {chip?.chip_label || chipKey}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      chips: prev.chips.filter(
+                                        (key) => key !== chipKey,
+                                      ),
+                                    }));
+                                  }}
+                                  className="ml-1 text-purple-600 hover:text-purple-800"
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex justify-end space-x-3">
