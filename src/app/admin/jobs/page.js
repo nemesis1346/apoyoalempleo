@@ -10,7 +10,7 @@ export default function AdminJobsPage() {
   // State management
   const [jobs, setJobs] = useState([]);
   const [companies, setCompanies] = useState([]);
-  const [chipTemplates, setChipTemplates] = useState({});
+  const [chips, setChips] = useState({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -38,7 +38,7 @@ export default function AdminJobsPage() {
     employment_type: "",
     location: [],
     description: "",
-    chip_template_ids: [], // Selected chip template IDs
+    chip_ids: [], // Selected chip IDs
   });
 
   // Load jobs
@@ -91,25 +91,25 @@ export default function AdminJobsPage() {
     }
   }, []);
 
-  // Load chip templates for selection
-  const loadChipTemplates = useCallback(async () => {
+  // Load chips for selection
+  const loadChips = useCallback(async () => {
     try {
-      const response = await adminService.chipTemplates.getAll({ limit: 100 });
+      const response = await adminService.chips.getAll({ limit: 100 });
 
       if (response.success) {
-        // Group templates by category
-        const grouped = response.data.reduce((acc, template) => {
-          const category = template.category || "other";
+        // Group chips by category
+        const grouped = response.data.reduce((acc, chip) => {
+          const category = chip.category || "other";
           if (!acc[category]) {
             acc[category] = [];
           }
-          acc[category].push(template);
+          acc[category].push(chip);
           return acc;
         }, {});
-        setChipTemplates(grouped);
+        setChips(grouped);
       }
     } catch (err) {
-      console.error("Load chip templates error:", err);
+      console.error("Load chips error:", err);
     }
   }, []);
 
@@ -121,14 +121,14 @@ export default function AdminJobsPage() {
       setSubmitting(true);
       setError(null);
 
-      // Prepare job data including chip template IDs
+      // Prepare job data including chip IDs
       const jobData = {
         company_id: formData.company_id,
         title: formData.title,
         employment_type: formData.employment_type,
         location: formData.location,
         description: formData.description,
-        chip_template_ids: formData.chip_template_ids,
+        chip_ids: formData.chip_ids,
       };
 
       let response;
@@ -154,7 +154,6 @@ export default function AdminJobsPage() {
       setSubmitting(false);
     }
   };
-
 
   // Handle delete
   const handleDelete = async (job) => {
@@ -188,7 +187,7 @@ export default function AdminJobsPage() {
       employment_type: "",
       location: [],
       description: "",
-      chip_template_ids: [],
+      chip_ids: [],
     });
     setEditingJob(null);
     setShowForm(false);
@@ -202,7 +201,7 @@ export default function AdminJobsPage() {
       employment_type: job.employment_type || "",
       location: Array.isArray(job.location) ? job.location : [],
       description: job.description || "",
-      chip_template_ids: job.chip_templates ? job.chip_templates.map(ct => ct.id) : [],
+      chip_ids: job.chips ? job.chips.map((c) => c.id) : [],
     });
     setEditingJob(job);
     setShowForm(true);
@@ -256,7 +255,7 @@ export default function AdminJobsPage() {
     if (user) {
       loadJobs();
       loadCompanies();
-      loadChipTemplates();
+      loadChips();
     }
   }, [
     user,
@@ -265,7 +264,7 @@ export default function AdminJobsPage() {
     filters,
     loadJobs,
     loadCompanies,
-    loadChipTemplates,
+    loadChips,
   ]);
 
   useEffect(() => {
@@ -505,7 +504,7 @@ export default function AdminJobsPage() {
         {/* Job Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-lg bg-white">
+            <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-lg bg-white mb-48">
               <div className="mt-2">
                 <h3 className="text-lg font-medium font-semibold text-gray-900 mb-4">
                   {editingJob ? "Edit Job" : "Add New Job"}
@@ -648,27 +647,27 @@ export default function AdminJobsPage() {
                       offer for this role.
                     </p>
 
-                    {Object.keys(chipTemplates).length > 0 ? (
+                    {Object.keys(chips).length > 0 ? (
                       <div className="space-y-4">
-                        {Object.entries(chipTemplates).map(
-                          ([category, chips]) => (
+                        {Object.entries(chips).map(
+                          ([category, categoryChips]) => (
                             <div key={category}>
                               <h4 className="text-sm font-medium text-gray-800 capitalize mb-2">
-                                {category} ({chips.length})
+                                {category} ({categoryChips.length})
                               </h4>
                               <div className="flex flex-wrap gap-2">
-                                {chips.map((chip) => (
+                                {categoryChips.map((chip) => (
                                   <button
                                     key={chip.id}
                                     type="button"
                                     onClick={() => {
                                       const isSelected =
-                                        formData.chip_template_ids.includes(chip.id);
+                                        formData.chip_ids.includes(chip.id);
                                       if (isSelected) {
                                         // Remove chip
                                         setFormData((prev) => ({
                                           ...prev,
-                                          chip_template_ids: prev.chip_template_ids.filter(
+                                          chip_ids: prev.chip_ids.filter(
                                             (id) => id !== chip.id,
                                           ),
                                         }));
@@ -676,12 +675,12 @@ export default function AdminJobsPage() {
                                         // Add chip
                                         setFormData((prev) => ({
                                           ...prev,
-                                          chip_template_ids: [...prev.chip_template_ids, chip.id],
+                                          chip_ids: [...prev.chip_ids, chip.id],
                                         }));
                                       }
                                     }}
                                     className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                                      formData.chip_template_ids.includes(chip.id)
+                                      formData.chip_ids.includes(chip.id)
                                         ? "border-purple-300 bg-purple-100 text-purple-800 font-medium"
                                         : "border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100"
                                     } cursor-pointer`}
@@ -697,24 +696,21 @@ export default function AdminJobsPage() {
                       </div>
                     ) : (
                       <div className="text-sm text-gray-500 italic">
-                        No chip templates available. Create some in the{" "}
-                        <span className="text-purple-600">Chip Templates</span>{" "}
-                        section first.
+                        No chips available. Create some in the{" "}
+                        <span className="text-purple-600">Chips</span> section
+                        first.
                       </div>
                     )}
 
-                    {formData.chip_template_ids.length > 0 && (
+                    {formData.chip_ids.length > 0 && (
                       <div className="mt-3 p-3 bg-purple-50 rounded-lg">
                         <div className="text-sm font-medium text-purple-800 mb-2">
-                          Selected chips ({formData.chip_template_ids.length}):
+                          Selected chips ({formData.chip_ids.length}):
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {formData.chip_template_ids.map((chipId) => {
-                            const allChips =
-                              Object.values(chipTemplates).flat();
-                            const chip = allChips.find(
-                              (c) => c.id === chipId,
-                            );
+                          {formData.chip_ids.map((chipId) => {
+                            const allChips = Object.values(chips).flat();
+                            const chip = allChips.find((c) => c.id === chipId);
                             return (
                               <span
                                 key={chipId}
@@ -726,7 +722,7 @@ export default function AdminJobsPage() {
                                   onClick={() => {
                                     setFormData((prev) => ({
                                       ...prev,
-                                      chip_template_ids: prev.chip_template_ids.filter(
+                                      chip_ids: prev.chip_ids.filter(
                                         (id) => id !== chipId,
                                       ),
                                     }));

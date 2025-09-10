@@ -4,13 +4,13 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../components/AuthContext";
 import { adminService } from "../../../services/adminService";
 
-export default function ChipTemplatesPage() {
+export default function ChipsPage() {
   const { user } = useAuth();
-  const [templates, setTemplates] = useState([]);
+  const [chips, setChips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState(null);
+  const [editingChip, setEditingChip] = useState(null);
   const [formData, setFormData] = useState({
     chip_key: "",
     chip_label: "",
@@ -40,8 +40,8 @@ export default function ChipTemplatesPage() {
     "other",
   ];
 
-  // Load chip templates
-  const loadTemplates = async () => {
+  // Load chips
+  const loadChips = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -52,27 +52,27 @@ export default function ChipTemplatesPage() {
         ...filters,
       };
 
-      const response = await adminService.chipTemplates.getAll(params);
+      const response = await adminService.chips.getAll(params);
 
       if (response.success) {
-        setTemplates(response.data);
+        setChips(response.data);
         setPagination((prev) => ({
           ...prev,
           total: response.meta.pagination.total,
           totalPages: response.meta.pagination.totalPages,
         }));
       } else {
-        setError(response.error || "Failed to fetch chip templates");
+        setError(response.error || "Failed to fetch chips");
       }
     } catch (err) {
-      console.error("Load templates error:", err);
-      setError("Failed to fetch chip templates");
+      console.error("Load chips error:", err);
+      setError("Failed to fetch chips");
     } finally {
       setLoading(false);
     }
   };
 
-  // Create or update chip template
+  // Create or update chip
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -81,34 +81,31 @@ export default function ChipTemplatesPage() {
       setError(null);
 
       let response;
-      if (editingTemplate) {
-        response = await adminService.chipTemplates.update(
-          editingTemplate.id,
-          formData,
-        );
+      if (editingChip) {
+        response = await adminService.chips.update(editingChip.id, formData);
       } else {
-        response = await adminService.chipTemplates.create(formData);
+        response = await adminService.chips.create(formData);
       }
 
       if (response.success) {
-        await loadTemplates();
+        await loadChips();
         setShowForm(false);
-        setEditingTemplate(null);
+        setEditingChip(null);
         resetForm();
       } else {
-        setError(response.error || "Failed to save chip template");
+        setError(response.error || "Failed to save chip");
       }
     } catch (err) {
       console.error("Submit error:", err);
-      setError("Failed to save chip template");
+      setError("Failed to save chip");
     } finally {
       setLoading(false);
     }
   };
 
-  // Delete chip template
-  const handleDelete = async (templateId) => {
-    if (!confirm("Are you sure you want to delete this chip template?")) {
+  // Delete chip
+  const handleDelete = async (chipId) => {
+    if (!confirm("Are you sure you want to delete this chip?")) {
       return;
     }
 
@@ -116,30 +113,30 @@ export default function ChipTemplatesPage() {
       setLoading(true);
       setError(null);
 
-      const response = await adminService.chipTemplates.delete(templateId);
+      const response = await adminService.chips.delete(chipId);
 
       if (response.success) {
-        await loadTemplates();
+        await loadChips();
       } else {
-        setError(response.error || "Failed to delete chip template");
+        setError(response.error || "Failed to delete chip");
       }
     } catch (err) {
       console.error("Delete error:", err);
-      setError("Failed to delete chip template");
+      setError("Failed to delete chip");
     } finally {
       setLoading(false);
     }
   };
 
-  // Edit chip template
-  const handleEdit = (template) => {
-    setEditingTemplate(template);
+  // Edit chip
+  const handleEdit = (chip) => {
+    setEditingChip(chip);
     setFormData({
-      chip_key: template.chip_key,
-      chip_label: template.chip_label,
-      category: template.category || "other",
-      description: template.description || "",
-      is_active: template.is_active,
+      chip_key: chip.chip_key,
+      chip_label: chip.chip_label,
+      category: chip.category || "other",
+      description: chip.description || "",
+      is_active: chip.is_active,
     });
     setShowForm(true);
   };
@@ -177,7 +174,7 @@ export default function ChipTemplatesPage() {
 
   useEffect(() => {
     if (user) {
-      loadTemplates();
+      loadChips();
     }
   }, [user, pagination.page, filters]);
 
@@ -185,13 +182,13 @@ export default function ChipTemplatesPage() {
     return <div>Loading...</div>;
   }
 
-  // Group templates by category for display
-  const groupedTemplates = templates.reduce((groups, template) => {
-    const category = template.category || "other";
+  // Group chips by category for display
+  const groupedChips = chips.reduce((groups, chip) => {
+    const category = chip.category || "other";
     if (!groups[category]) {
       groups[category] = [];
     }
-    groups[category].push(template);
+    groups[category].push(chip);
     return groups;
   }, {});
 
@@ -203,7 +200,7 @@ export default function ChipTemplatesPage() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Chip Templates Management
+                Chips Management
               </h1>
               <p className="text-gray-600 mt-2">
                 Manage reusable offer chips for job postings
@@ -212,12 +209,12 @@ export default function ChipTemplatesPage() {
             <button
               onClick={() => {
                 setShowForm(true);
-                setEditingTemplate(null);
+                setEditingChip(null);
                 resetForm();
               }}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
             >
-              Add Chip Template
+              Add Chip
             </button>
           </div>
 
@@ -270,7 +267,7 @@ export default function ChipTemplatesPage() {
           </div>
         </div>
 
-        {/* Chip Templates by Category */}
+        {/* Chips by Category */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-12">
@@ -279,15 +276,14 @@ export default function ChipTemplatesPage() {
             </div>
           ) : (
             <div className="space-y-6">
-              {Object.keys(groupedTemplates).length === 0 ? (
+              {Object.keys(groupedChips).length === 0 ? (
                 <div className="bg-white rounded-lg shadow p-12 text-center">
-                  <p className="text-gray-500">No chip templates found</p>
+                  <p className="text-gray-500">No chips found</p>
                 </div>
               ) : (
                 validCategories.map((categoryKey) => {
-                  const categoryTemplates = groupedTemplates[categoryKey];
-                  if (!categoryTemplates || categoryTemplates.length === 0)
-                    return null;
+                  const categoryChips = groupedChips[categoryKey];
+                  if (!categoryChips || categoryChips.length === 0) return null;
 
                   return (
                     <div
@@ -296,51 +292,51 @@ export default function ChipTemplatesPage() {
                     >
                       <div className="px-4 py-3 border-b border-gray-200">
                         <h3 className="text-lg font-medium text-gray-900 capitalize">
-                          {categoryKey} ({categoryTemplates.length})
+                          {categoryKey} ({categoryChips.length})
                         </h3>
                       </div>
                       <div className="px-4 py-3">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {categoryTemplates.map((template) => (
+                          {categoryChips.map((chip) => (
                             <div
-                              key={template.id}
+                              key={chip.id}
                               className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow"
                             >
                               <div className="flex justify-between items-start mb-2">
                                 <div className="flex-1">
                                   <div className="font-medium text-gray-900">
-                                    {template.chip_label}
+                                    {chip.chip_label}
                                   </div>
                                   <div className="text-sm text-gray-500 font-mono">
-                                    {template.chip_key}
+                                    {chip.chip_key}
                                   </div>
-                                  {template.description && (
+                                  {chip.description && (
                                     <div className="text-sm text-gray-600 mt-1">
-                                      {template.description}
+                                      {chip.description}
                                     </div>
                                   )}
                                 </div>
                                 <div className="flex items-center space-x-2 ml-2">
                                   <span
                                     className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                      template.is_active
+                                      chip.is_active
                                         ? "bg-green-100 text-green-800"
                                         : "bg-red-100 text-red-800"
                                     }`}
                                   >
-                                    {template.is_active ? "Active" : "Inactive"}
+                                    {chip.is_active ? "Active" : "Inactive"}
                                   </span>
                                 </div>
                               </div>
                               <div className="flex justify-end space-x-1">
                                 <button
-                                  onClick={() => handleEdit(template)}
+                                  onClick={() => handleEdit(chip)}
                                   className="text-blue-600 hover:text-blue-900 text-sm"
                                 >
                                   ✏️
                                 </button>
                                 <button
-                                  onClick={() => handleDelete(template.id)}
+                                  onClick={() => handleDelete(chip.id)}
                                   className="text-red-600 hover:text-red-900 text-sm"
                                 >
                                   🗑️
@@ -392,7 +388,7 @@ export default function ChipTemplatesPage() {
             <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white mb-24">
               <div className="mt-3">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  {editingTemplate ? "Edit Chip Template" : "Add Chip Template"}
+                  {editingChip ? "Edit Chip" : "Add Chip"}
                 </h3>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -409,7 +405,7 @@ export default function ChipTemplatesPage() {
                           ...formData,
                           chip_label: label,
                           // Auto-generate key if not editing
-                          chip_key: editingTemplate
+                          chip_key: editingChip
                             ? formData.chip_key
                             : generateChipKey(label),
                         });
@@ -494,27 +490,17 @@ export default function ChipTemplatesPage() {
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          is_active: e.target.value === "true",
+                          is_active: e.target.value,
                         })
                       }
                       className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
                     >
-                      <option value="true">Active</option>
-                      <option value="false">Inactive</option>
+                      <option value={1}>Active</option>
+                      <option value={0}>Inactive</option>
                     </select>
                   </div>
 
-                  <div className="flex justify-end space-x-3 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowForm(false);
-                        setEditingTemplate(null);
-                      }}
-                      className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                      Cancel
-                    </button>
+                  <div className="flex justify-end space-x-2 pt-2">
                     <button
                       type="submit"
                       disabled={loading}
@@ -522,9 +508,19 @@ export default function ChipTemplatesPage() {
                     >
                       {loading
                         ? "Saving..."
-                        : editingTemplate
+                        : editingChip
                         ? "Update"
                         : "Create"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForm(false);
+                        setEditingChip(null);
+                      }}
+                      className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      Cancel
                     </button>
                   </div>
                 </form>

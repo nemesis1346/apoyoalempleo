@@ -235,10 +235,10 @@ export const adminService = {
     },
   },
 
-  // Chip Templates Management
-  chipTemplates: {
+  // Chips Management (new naming)
+  chips: {
     /**
-     * Get all chip templates (admin view)
+     * Get all chips (admin view)
      */
     getAll: async (params = {}) => {
       const queryParams = new URLSearchParams();
@@ -249,46 +249,99 @@ export const adminService = {
       if (params.category) queryParams.append("category", params.category);
 
       const queryString = queryParams.toString();
-      const url = `/admin/chip-templates${
-        queryString ? `?${queryString}` : ""
-      }`;
+      const url = `/admin/chips${queryString ? `?${queryString}` : ""}`;
 
       return await api.get(url);
     },
 
     /**
-     * Get chip templates grouped by category
+     * Get chips grouped by category
      */
     getByCategory: async () => {
-      return await api.get("/admin/chip-templates/categories");
+      return await api.get("/admin/chips/categories");
     },
 
     /**
-     * Get single chip template by ID
+     * Get single chip by ID
      */
     getById: async (id) => {
-      return await api.get(`/admin/chip-templates/${id}`);
+      return await api.get(`/admin/chips/${id}`);
     },
 
     /**
-     * Create new chip template
+     * Create new chip
      */
     create: async (data) => {
-      return await api.post("/admin/chip-templates", data);
+      return await api.post("/admin/chips", data);
     },
 
     /**
-     * Update existing chip template
+     * Update existing chip
      */
     update: async (id, data) => {
-      return await api.put(`/admin/chip-templates/${id}`, data);
+      return await api.put(`/admin/chips/${id}`, data);
+    },
+
+    /**
+     * Delete chip
+     */
+    delete: async (id) => {
+      return await api.delete(`/admin/chips/${id}`);
+    },
+  },
+
+  // Chips Management (legacy support)
+  chips: {
+    /**
+     * Get all chips (admin view)
+     */
+    getAll: async (params = {}) => {
+      const queryParams = new URLSearchParams();
+
+      if (params.page) queryParams.append("page", params.page);
+      if (params.limit) queryParams.append("limit", params.limit);
+      if (params.search) queryParams.append("search", params.search);
+      if (params.category) queryParams.append("category", params.category);
+
+      const queryString = queryParams.toString();
+      const url = `/admin/chips${queryString ? `?${queryString}` : ""}`;
+
+      return await api.get(url);
+    },
+
+    /**
+     * Get chips grouped by category
+     */
+    getByCategory: async () => {
+      return await api.get("/admin/chips/categories");
+    },
+
+    /**
+     * Get single chip by ID
+     */
+    getById: async (id) => {
+      return await api.get(`/admin/chips/${id}`);
+    },
+
+    /**
+     * Create new chip
+     */
+    create: async (data) => {
+      return await api.post("/admin/chips", data);
+    },
+
+    /**
+     * Update existing chip
+     */
+    update: async (id, data) => {
+      return await api.put(`/admin/chips/${id}`, data);
     },
 
     /**
      * Delete chip template
      */
     delete: async (id) => {
-      return await api.delete(`/admin/chip-templates/${id}`);
+      return await api.delete(`/admin/chips/${id}`);
     },
   },
 

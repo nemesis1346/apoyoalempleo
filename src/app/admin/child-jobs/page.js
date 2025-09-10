@@ -566,17 +566,7 @@ export default function ChildJobsPage() {
                     </select>
                   </div>
 
-                  <div className="flex justify-end space-x-3 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowForm(false);
-                        setEditingChildJob(null);
-                      }}
-                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                      Cancel
-                    </button>
+                  <div className="flex justify-end space-x-2 pt-2">
                     <button
                       type="submit"
                       disabled={loading}
@@ -587,6 +577,16 @@ export default function ChildJobsPage() {
                         : editingChildJob
                         ? "Update"
                         : "Create"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForm(false);
+                        setEditingChildJob(null);
+                      }}
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      Cancel
                     </button>
                   </div>
                 </form>

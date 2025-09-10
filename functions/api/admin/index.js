@@ -5,7 +5,7 @@ import { handleJobsRequest } from "./jobs.js";
 import { handleContactsRequest } from "./contacts.js";
 import { handleChildJobsRequest } from "./child-jobs.js";
 import { handleAISnapshotsRequest } from "./ai-snapshots.js";
-import { handleChipTemplatesRequest } from "./chip-templates.js";
+import { handleChipsRequest } from "./chips.js";
 
 export async function handleAdminRequest(request, env) {
   const url = new URL(request.url);
@@ -68,8 +68,8 @@ export async function handleAdminRequest(request, env) {
           user,
         );
         break;
-      case "chip-templates":
-        response = await handleChipTemplatesRequest(
+      case "chips":
+        response = await handleChipsRequest(
           method,
           resourceId,
           request,
@@ -111,41 +111,34 @@ async function handleStats(method, request, env, user) {
       jobsCount,
       childJobsCount,
       aiSnapshotsCount,
-      chipTemplatesCount,
       contactsCount,
       usersCount;
+    chipsCount;
 
     if (user.role === "super_admin") {
       // Super admin sees all stats
-      const [
-        companies,
-        jobs,
-        childJobs,
-        aiSnapshots,
-        chipTemplates,
-        contacts,
-        users,
-      ] = await Promise.all([
-        env.DB.prepare("SELECT COUNT(*) as count FROM companies").first(),
-        env.DB.prepare("SELECT COUNT(*) as count FROM jobs").first(),
-        env.DB.prepare(
-          "SELECT COUNT(*) as count FROM child_jobs WHERE is_active = 1",
-        ).first(),
-        env.DB.prepare(
-          "SELECT COUNT(*) as count FROM ai_snapshots WHERE is_active = 1",
-        ).first(),
-        env.DB.prepare(
-          "SELECT COUNT(*) as count FROM chip_templates WHERE is_active = 1",
-        ).first(),
-        env.DB.prepare("SELECT COUNT(*) as count FROM contacts").first(),
-        env.DB.prepare("SELECT COUNT(*) as count FROM users").first(),
-      ]);
+      const [companies, jobs, childJobs, aiSnapshots, chips, contacts, users] =
+        await Promise.all([
+          env.DB.prepare("SELECT COUNT(*) as count FROM companies").first(),
+          env.DB.prepare("SELECT COUNT(*) as count FROM jobs").first(),
+          env.DB.prepare(
+            "SELECT COUNT(*) as count FROM child_jobs WHERE is_active = 1",
+          ).first(),
+          env.DB.prepare(
+            "SELECT COUNT(*) as count FROM ai_snapshots WHERE is_active = 1",
+          ).first(),
+          env.DB.prepare(
+            "SELECT COUNT(*) as count FROM chips WHERE is_active = 1",
+          ).first(),
+          env.DB.prepare("SELECT COUNT(*) as count FROM contacts").first(),
+          env.DB.prepare("SELECT COUNT(*) as count FROM users").first(),
+        ]);
 
       companiesCount = companies.count;
       jobsCount = jobs.count;
       childJobsCount = childJobs.count;
       aiSnapshotsCount = aiSnapshots.count;
-      chipTemplatesCount = chipTemplates.count;
+      chipsCount = chips.count;
       contactsCount = contacts.count;
       usersCount = users.count;
     } else {
@@ -172,13 +165,13 @@ async function handleStats(method, request, env, user) {
           .first(),
       ]);
 
-      // AI snapshots and chip templates are global, so all admins can see them
-      const [aiSnapshots, chipTemplates] = await Promise.all([
+      // AI snapshots and chips are global, so all admins can see them
+      const [aiSnapshots, chips] = await Promise.all([
         env.DB.prepare(
           "SELECT COUNT(*) as count FROM ai_snapshots WHERE is_active = 1",
         ).first(),
         env.DB.prepare(
-          "SELECT COUNT(*) as count FROM chip_templates WHERE is_active = 1",
+          "SELECT COUNT(*) as count FROM chips WHERE is_active = 1",
         ).first(),
       ]);
 
@@ -186,7 +179,7 @@ async function handleStats(method, request, env, user) {
       jobsCount = jobs.count;
       childJobsCount = childJobs.count;
       aiSnapshotsCount = aiSnapshots.count;
-      chipTemplatesCount = chipTemplates.count;
+      chipsCount = chips.count;
       contactsCount = contacts.count;
       usersCount = 0; // Company admins can't see user stats
     }
@@ -196,7 +189,7 @@ async function handleStats(method, request, env, user) {
       jobs: jobsCount,
       childJobs: childJobsCount,
       aiSnapshots: aiSnapshotsCount,
-      chipTemplates: chipTemplatesCount,
+      chips: chipsCount,
       contacts: contactsCount,
       users: usersCount,
     });

@@ -155,100 +155,56 @@ async function getJobs(env, user, url) {
 
     const { results } = await stmt.bind(...queryParams, limit, offset).all();
 
-    // Get chip templates for each job
-    const jobIds = results.map(job => job.id);
-    let chipTemplates = {};
-    
-    if (jobIds.length > 0) {
-      // Debug: Check what tables exist
-      try {
-        const tablesStmt = env.DB.prepare(`
-          SELECT name FROM sqlite_master WHERE type='table' AND (name='job_chip_templates' OR name='job_offer_chips')
-        `);
-        const { results: tables } = await tablesStmt.all();
-        console.log("Available tables:", tables.map(t => t.name));
-      } catch (e) {
-        console.log("Error checking tables:", e.message);
-      }
+    // Get chips for each job
+    const jobIds = results.map((job) => job.id);
+    let chips = {};
 
-      // Try to get chip templates - check if new table exists first
+    if (jobIds.length > 0) {
       let chipResults = [];
       try {
         const chipStmt = env.DB.prepare(`
           SELECT 
-            jct.job_id,
-            ct.id,
-            ct.chip_key,
-            ct.chip_label,
-            ct.category,
-            jct.display_order
-          FROM job_chip_templates jct
-          INNER JOIN chip_templates ct ON jct.chip_template_id = ct.id
-          WHERE jct.job_id IN (${jobIds.map(() => '?').join(',')})
-          ORDER BY jct.job_id, jct.display_order
+            jc.job_id,
+            c.id,
+            c.chip_key,
+            c.chip_label,
+            c.category,
+            jc.display_order
+          FROM job_chips jc
+          INNER JOIN chips c ON jc.chip_id = c.id
+          WHERE jc.job_id IN (${jobIds.map(() => "?").join(",")})
+          ORDER BY jc.job_id, jc.display_order
         `);
-        
+
         const result = await chipStmt.bind(...jobIds).all();
         chipResults = result.results || [];
-        console.log(`Found ${chipResults.length} chip templates from new table for jobs:`, jobIds);
       } catch (error) {
-        console.log("New job_chip_templates table not available, trying old table:", error.message);
-        
-        // Fallback to old job_offer_chips table
-        try {
-          const oldChipStmt = env.DB.prepare(`
-            SELECT 
-              joc.job_id,
-              joc.chip_key,
-              joc.chip_label,
-              joc.display_order,
-              ct.id,
-              ct.category
-            FROM job_offer_chips joc
-            LEFT JOIN chip_templates ct ON joc.chip_key = ct.chip_key
-            WHERE joc.job_id IN (${jobIds.map(() => '?').join(',')}) AND joc.is_active = 1
-            ORDER BY joc.job_id, joc.display_order
-          `);
-          
-          const result = await oldChipStmt.bind(...jobIds).all();
-          chipResults = (result.results || []).map(chip => ({
-            job_id: chip.job_id,
-            id: chip.id || null,
-            chip_key: chip.chip_key,
-            chip_label: chip.chip_label,
-            category: chip.category || 'other',
-            display_order: chip.display_order
-          }));
-          console.log(`Found ${chipResults.length} chip templates from old table for jobs:`, jobIds);
-        } catch (fallbackError) {
-          console.error("Error fetching from old table:", fallbackError.message);
-        }
+        console.log("Failed to get chips", error.message);
+        chipResults = [];
       }
-      
+
       // Process results
-      chipResults.forEach(chip => {
-        if (!chipTemplates[chip.job_id]) {
-          chipTemplates[chip.job_id] = [];
+      chipResults.forEach((chip) => {
+        if (!chips[chip.job_id]) {
+          chips[chip.job_id] = [];
         }
-        chipTemplates[chip.job_id].push({
+        chips[chip.job_id].push({
           id: chip.id,
           chip_key: chip.chip_key,
           chip_label: chip.chip_label,
           category: chip.category,
-          display_order: chip.display_order
+          display_order: chip.display_order,
         });
       });
-      
-      console.log("Final chipTemplates object:", chipTemplates);
     }
 
-    // Parse location JSON arrays in results and add chip templates
+    // Parse location JSON arrays in results and add chips
     const jobs = results.map((job) => {
       const { company_logo_url, company_color, company_name, ...jobItem } = job;
       return {
         ...jobItem,
         location: job.location ? JSON.parse(job.location) : [],
-        chip_templates: chipTemplates[job.id] || [],
+        chips: chips[job.id] || [],
         company: {
           name: company_name,
           logo_url: company_logo_url,
@@ -324,17 +280,24 @@ async function createJob(request, env, user) {
       }
     }
 
-    // Validate chip template IDs if provided
-    if (data.chip_template_ids && Array.isArray(data.chip_template_ids)) {
-      if (data.chip_template_ids.length > 0) {
-        const chipTemplateStmt = env.DB.prepare(`
-          SELECT COUNT(*) as count FROM chip_templates 
-          WHERE id IN (${data.chip_template_ids.map(() => '?').join(',')}) AND is_active = 1
+    // Validate chip IDs if provided
+    if (data.chip_ids && Array.isArray(data.chip_ids)) {
+      if (data.chip_ids.length > 0) {
+        let chipStmt;
+        chipStmt = env.DB.prepare(`
+          SELECT COUNT(*) as count FROM chips 
+          WHERE id IN (${data.chip_ids
+            .map(() => "?")
+            .join(",")}) AND is_active = 1
         `);
-        const { count } = await chipTemplateStmt.bind(...data.chip_template_ids).first();
-        
-        if (count !== data.chip_template_ids.length) {
-          return createResponse({ error: "One or more chip templates are invalid or inactive" }, 400);
+
+        const { count } = await chipStmt.bind(...data.chip_ids).first();
+
+        if (count !== data.chip_ids.length) {
+          return createResponse(
+            { error: "One or more chips are invalid or inactive" },
+            400,
+          );
         }
       }
     }
@@ -356,9 +319,13 @@ async function createJob(request, env, user) {
 
     const jobId = result.meta.last_row_id;
 
-    // Handle chip templates
-    if (data.chip_template_ids && Array.isArray(data.chip_template_ids) && data.chip_template_ids.length > 0) {
-      await updateJobChipTemplates(env, jobId, data.chip_template_ids);
+    // Handle chips
+    if (
+      data.chip_ids &&
+      Array.isArray(data.chip_ids) &&
+      data.chip_ids.length > 0
+    ) {
+      await updateJobChips(env, jobId, data.chip_ids);
     }
 
     return createResponse(
@@ -404,62 +371,28 @@ async function getJob(jobId, env, user) {
       return createResponse({ error: "Access denied" }, 403);
     }
 
-    // Get chip templates for this job
+    // Get chips for this job
     let chipResults = [];
-    try {
-      const chipStmt = env.DB.prepare(`
-        SELECT 
-          ct.id,
-          ct.chip_key,
-          ct.chip_label,
-          ct.category,
-          jct.display_order
-        FROM job_chip_templates jct
-        INNER JOIN chip_templates ct ON jct.chip_template_id = ct.id
-        WHERE jct.job_id = ?
-        ORDER BY jct.display_order
-      `);
-      
-      const result = await chipStmt.bind(jobId).all();
-      chipResults = result.results || [];
-      console.log(`Found ${chipResults.length} chip templates from new table for job ${jobId}`);
-    } catch (error) {
-      console.log("New job_chip_templates table not available, trying old table:", error.message);
-      
-      // Fallback to old job_offer_chips table
-      try {
-        const oldChipStmt = env.DB.prepare(`
-          SELECT 
-            joc.chip_key,
-            joc.chip_label,
-            joc.display_order,
-            ct.id,
-            ct.category
-          FROM job_offer_chips joc
-          LEFT JOIN chip_templates ct ON joc.chip_key = ct.chip_key
-          WHERE joc.job_id = ? AND joc.is_active = 1
-          ORDER BY joc.display_order
-        `);
-        
-        const result = await oldChipStmt.bind(jobId).all();
-        chipResults = (result.results || []).map(chip => ({
-          id: chip.id || null,
-          chip_key: chip.chip_key,
-          chip_label: chip.chip_label,
-          category: chip.category || 'other',
-          display_order: chip.display_order
-        }));
-        console.log(`Found ${chipResults.length} chip templates from old table for job ${jobId}`);
-      } catch (fallbackError) {
-        console.error("Error fetching from old table:", fallbackError.message);
-        chipResults = [];
-      }
-    }
+    const chipStmt = env.DB.prepare(`
+      SELECT 
+        c.id,
+        c.chip_key,
+        c.chip_label,
+        c.category,
+        jc.display_order
+      FROM job_chips jc
+      INNER JOIN chips c ON jc.chip_id = c.id
+      WHERE jc.job_id = ?
+      ORDER BY jc.display_order
+    `);
+
+    const result = await chipStmt.bind(jobId).all();
+    chipResults = result.results || [];
 
     // Parse location JSON array
     const { company_logo_url, company_color, company_name, ...jobItem } = job;
     job.location = job.location ? JSON.parse(job.location) : [];
-    job.chip_templates = chipResults || [];
+    job.chips = chipResults || [];
     job.company = {
       name: company_name,
       logo_url: company_logo_url,
@@ -537,17 +470,24 @@ async function updateJob(jobId, request, env, user) {
       }
     }
 
-    // Validate chip template IDs if provided
-    if (data.chip_template_ids && Array.isArray(data.chip_template_ids)) {
-      if (data.chip_template_ids.length > 0) {
-        const chipTemplateStmt = env.DB.prepare(`
-          SELECT COUNT(*) as count FROM chip_templates 
-          WHERE id IN (${data.chip_template_ids.map(() => '?').join(',')})
+    // Validate chip IDs if provided
+    if (data.chip_ids && Array.isArray(data.chip_ids)) {
+      if (data.chip_ids.length > 0) {
+        let chipStmt;
+        chipStmt = env.DB.prepare(`
+          SELECT COUNT(*) as count FROM chips 
+          WHERE id IN (${data.chip_ids
+            .map(() => "?")
+            .join(",")}) AND is_active = 1
         `);
-        const { count } = await chipTemplateStmt.bind(...data.chip_template_ids).first();
-        
-        if (count !== data.chip_template_ids.length) {
-          return createResponse({ error: "One or more chip templates are invalid or inactive" }, 400);
+
+        const { count } = await chipStmt.bind(...data.chip_ids).first();
+
+        if (count !== data.chip_ids.length) {
+          return createResponse(
+            { error: "One or more chips are invalid or inactive" },
+            400,
+          );
         }
       }
     }
@@ -572,9 +512,9 @@ async function updateJob(jobId, request, env, user) {
       return createResponse({ error: "Job not found" }, 404);
     }
 
-    // Handle chip templates update
-    if (data.chip_template_ids !== undefined) {
-      await updateJobChipTemplates(env, jobId, data.chip_template_ids || []);
+    // Handle chips update
+    if (data.chip_ids !== undefined) {
+      await updateJobChips(env, jobId, data.chip_ids || []);
     }
 
     return createResponse({
@@ -641,29 +581,28 @@ async function deleteJob(jobId, env, user) {
   }
 }
 
-// Helper function to update job chip templates
-async function updateJobChipTemplates(env, jobId, chipTemplateIds) {
+// Helper function to update job chips
+async function updateJobChips(env, jobId, chipIds) {
   try {
-    // Remove existing chip templates for this job
-    const deleteStmt = env.DB.prepare(`
-      DELETE FROM job_chip_templates WHERE job_id = ?
+    let deleteStmt, insertStmt;
+    deleteStmt = env.DB.prepare(`DELETE FROM job_chips WHERE job_id = ?`);
+    insertStmt = env.DB.prepare(`
+      INSERT INTO job_chips (job_id, chip_id, display_order)
+      VALUES (?, ?, ?)
     `);
+
+    // Remove existing chips for this job
     await deleteStmt.bind(jobId).run();
 
-    // Add new chip templates if any
-    if (chipTemplateIds && chipTemplateIds.length > 0) {
-      const insertStmt = env.DB.prepare(`
-        INSERT INTO job_chip_templates (job_id, chip_template_id, display_order)
-        VALUES (?, ?, ?)
-      `);
-
-      // Insert each chip template with display order
-      for (let i = 0; i < chipTemplateIds.length; i++) {
-        await insertStmt.bind(jobId, chipTemplateIds[i], i).run();
+    // Add new chips if any
+    if (chipIds && chipIds.length > 0) {
+      // Insert each chip with display order
+      for (let i = 0; i < chipIds.length; i++) {
+        await insertStmt.bind(jobId, chipIds[i], i).run();
       }
     }
   } catch (error) {
-    console.error("Update job chip templates error:", error);
+    console.error("Update job chips error:", error);
     throw error;
   }
 }

@@ -719,17 +719,7 @@ export default function AISnapshotsPage() {
                     />
                   </div>
 
-                  <div className="flex justify-end space-x-3 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowForm(false);
-                        setEditingSnapshot(null);
-                      }}
-                      className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                      Cancel
-                    </button>
+                  <div className="flex justify-end space-x-2 pt-2">
                     <button
                       type="submit"
                       disabled={loading}
@@ -740,6 +730,16 @@ export default function AISnapshotsPage() {
                         : editingSnapshot
                         ? "Update"
                         : "Create"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForm(false);
+                        setEditingSnapshot(null);
+                      }}
+                      className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      Cancel
                     </button>
                   </div>
                 </form>

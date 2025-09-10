@@ -12,7 +12,7 @@ export default function AdminDashboard() {
     jobs: 0,
     childJobs: 0,
     aiSnapshots: 0,
-    chipTemplates: 0,
+    chips: 0,
     contacts: 0,
     users: 0,
   });
@@ -34,7 +34,7 @@ export default function AdminDashboard() {
           jobs: response.jobs || 0,
           childJobs: response.childJobs || 0,
           aiSnapshots: response.aiSnapshots || 0,
-          chipTemplates: response.chipTemplates || 0,
+          chips: response.chips || 0,
           contacts: response.contacts || 0,
           users: response.users || 0,
         });
@@ -95,8 +95,8 @@ export default function AdminDashboard() {
       show: true,
     },
     {
-      name: "Chip Templates",
-      value: stats.chipTemplates,
+      name: "Chips",
+      value: stats.chips,
       icon: "🏷️",
       color: "bg-pink-500",
       show: true,
@@ -288,7 +288,7 @@ export default function AdminDashboard() {
               </div>
             </Link>
             <Link
-              href="/admin/chip-templates"
+              href="/admin/chips"
               className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:shadow-sm transition-all duration-150 group"
             >
               <div className="flex items-center">
@@ -297,10 +297,10 @@ export default function AdminDashboard() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-900">
-                    Manage Chip Templates
+                    Manage Chips
                   </p>
                   <p className="text-xs text-gray-500">
-                    Create and update chip templates
+                    Create and update chips
                   </p>
                 </div>
               </div>
