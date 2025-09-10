@@ -2,7 +2,7 @@
 const CompanyCardSkeleton = () => (
   <div className="flex flex-col border-1 border-[#e7e7e7] shadow-[0 8px 24px rgba(0, 0, 0, .06)] rounded-lg animate-pulse">
     <div
-      className="flex items-center justify-center w-full h-28 border-b rounded-t-lg p-4"
+      className="flex items-center justify-center w-full h-28 border-b rounded-t-lg p-2 md:p-4"
       style={{
         borderBottomColor: "#e7e7e7",
         background: `
@@ -12,7 +12,7 @@ const CompanyCardSkeleton = () => (
         `,
       }}
     ></div>
-    <div className="flex flex-col gap-2 p-4">
+    <div className="flex flex-col gap-2 p-2 md:p-4">
       <div className="bg-gray-200 rounded w-2/3 h-4"></div>
       <div className="bg-gray-200 rounded w-1/3 h-3"></div>
       <div className="bg-gray-200 rounded w-full h-3"></div>

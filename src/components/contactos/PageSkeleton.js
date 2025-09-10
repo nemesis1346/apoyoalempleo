@@ -1,7 +1,7 @@
 import ContactCardSkeleton from "./ContactCardSkeleton";
 
 const PageSkeleton = () => (
-  <div className="bg-white shadow-lg p-4">
+  <div className="bg-white shadow-lg p-2 md:p-4">
     <h2 className="text-[#222] text-[18px] font-bold mb-1">Contacts</h2>
 
     {/* Skeleton for search section */}
@@ -23,7 +23,7 @@ const PageSkeleton = () => (
     </div>
 
     {/* Skeleton for jobs list */}
-    <div className="space-y-4">
+    <div className="space-y-2 md:space-y-4">
       {Array.from({ length: 7 }).map((_, index) => (
         <ContactCardSkeleton key={index} />
       ))}

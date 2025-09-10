@@ -7,7 +7,7 @@ import { useState } from "react";
 function JobHeroSection({ job, contacts, liveJobs }) {
   return (
     <header
-      className="mb-4 min-h-32 border-b p-4"
+      className="mb-4 min-h-32 border-b p-2 md:p-4"
       style={{
         borderBottomColor: job.company.color || "#e7e7e7",
         background: `
@@ -37,7 +37,7 @@ function JobHeroSection({ job, contacts, liveJobs }) {
         </div>
 
         {/* Job Information */}
-        <div className="flex flex-col w-full px-2 py-2 gap-1 justify-between">
+        <div className="flex flex-col w-full px-2 md:px-4 py-2 gap-1 justify-between">
           <h1 className="text-xl font-bold text-white drop-shadow-lg">
             {job.title}
           </h1>
@@ -76,19 +76,19 @@ function JobHeroSection({ job, contacts, liveJobs }) {
 
       {/* Job Stats */}
       <div className="flex gap-1 mt-4 justify-center">
-        <div className="flex items-center p-2 rounded-lg bg-white border border-gray-300 w-22">
+        <div className="flex items-center p-2 md:p-4 rounded-lg bg-white border border-gray-300 w-22">
           <div className="flex flex-col text-xs">
             <span>Contacts</span>
             <span className="font-bold">{contacts?.length || 0} verified</span>
           </div>
         </div>
-        <div className="flex items-center p-2 rounded-lg bg-white border border-gray-300 w-22">
+        <div className="flex items-center p-2 md:p-4 rounded-lg bg-white border border-gray-300 w-22">
           <div className="flex flex-col text-xs">
             <span>Live Listings</span>
             <span className="font-bold">{liveJobs?.length || 0}</span>
           </div>
         </div>
-        <div className="flex items-center p-2 rounded-lg bg-white border border-gray-300 w-22">
+        <div className="flex items-center p-2 md:p-4 rounded-lg bg-white border border-gray-300 w-22">
           <div className="flex flex-col text-xs">
             <span>Status</span>
             <span className="font-bold">Active</span>
@@ -115,7 +115,7 @@ function ContactsSection({
         <h2 className="text-lg font-bold text-gray-800">Verified HR contact</h2>
         <button
           onClick={() => setShowGuideHR(!showGuideHR)}
-          className="border border-gray-200 bg-gray-50 px-2 py-1 rounded-full text-xs cursor-pointer hover:bg-gray-100 transition-colors"
+          className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-1 rounded-full text-xs cursor-pointer hover:bg-gray-100 transition-colors"
           aria-pressed={showGuideHR}
         >
           ? Tips
@@ -123,7 +123,7 @@ function ContactsSection({
       </div>
 
       {showGuideHR && (
-        <div className="border border-gray-200 rounded-xl bg-gray-50 p-3 mb-2">
+        <div className="border border-gray-200 rounded-xl bg-gray-50 p-2 md:p-4 mb-2">
           <div className="font-bold mb-1">How to pick the best contact</div>
           <ul className="space-y-1 ml-4 text-sm">
             <li>Prefer the most active contact with higher reply %.</li>
@@ -139,7 +139,7 @@ function ContactsSection({
       )}
 
       <div
-        className={`border border-gray-200 rounded-xl bg-white p-3 shadow-lg cursor-pointer ${
+        className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ${
           selectedContactId === "p1" ? "ring-2 shadow-xl" : ""
         } mb-2`}
         style={{
@@ -179,7 +179,7 @@ function ContactsSection({
               </span>
             </div>
           </div>
-          <span className="border border-gray-300 bg-gray-50 px-2 py-1 rounded-full text-xs text-nowrap">
+          <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-1 rounded-full text-xs text-nowrap">
             {selectedContactId === "p1" ? "Selected" : "Tap to select"}
           </span>
         </div>
@@ -187,7 +187,7 @@ function ContactsSection({
 
       <button
         onClick={() => setShowMoreContacts(!showMoreContacts)}
-        className="border border-gray-200 bg-gray-50 px-4 py-2 rounded-xl w-full hover:bg-gray-100 transition-colors"
+        className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-2 rounded-xl w-full hover:bg-gray-100 transition-colors"
       >
         {showMoreContacts ? "Hide contacts" : "Show more contacts"}
       </button>
@@ -197,7 +197,7 @@ function ContactsSection({
           {contacts.slice(1).map((contact) => (
             <div
               key={contact.id}
-              className={`border border-gray-200 rounded-xl bg-white p-3 shadow-lg cursor-pointer ${
+              className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ${
                 selectedContactId === contact.id ? "ring-2 shadow-xl" : ""
               }`}
               style={{
@@ -237,7 +237,7 @@ function ContactsSection({
                     </span>
                   </div>
                 </div>
-                <span className="border border-gray-300 bg-gray-50 px-2 py-1 rounded-full text-xs">
+                <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-1 rounded-full text-xs">
                   {selectedContactId === contact.id
                     ? "Selected"
                     : "Tap to select"}
@@ -273,7 +273,7 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-bold text-gray-800">Live listings</h2>
-          <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full text-xs">
+          <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-0.5 rounded-full text-xs">
             {liveJobs.length}
           </span>
         </div>
@@ -288,7 +288,7 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
         {liveJobs.slice(0, 2).map((liveJob) => (
           <div
             key={liveJob.id}
-            className={`border border-gray-200 rounded-xl bg-white p-3 shadow-lg cursor-pointer ${
+            className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ${
               extJob?.id === liveJob.id ? "ring-2 shadow-xl" : ""
             }`}
             style={{
@@ -310,11 +310,11 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
                   </h3>
                 </div>
                 <div className="text-xs text-gray-600">
-                  <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
+                  <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-0.5 rounded-full">
                     {liveJob.source}
                   </span>{" "}
                   • {liveJob.city} •{" "}
-                  <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
+                  <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-0.5 rounded-full">
                     {freshness(liveJob.ageHours)}
                   </span>
                 </div>
@@ -325,14 +325,14 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
                     href={liveJob.url}
                     target="_blank"
                     rel="noopener"
-                    className="border border-gray-200 bg-gray-50 px-3 py-1 rounded-xl text-xs hover:bg-gray-100 transition-colors"
+                    className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-1 rounded-xl text-xs hover:bg-gray-100 transition-colors"
                     onClick={(e) => e.stopPropagation()}
                   >
                     Open ↗
                   </a>
                 </div>
                 <button
-                  className="border border-gray-200 bg-gray-50 px-3 py-1 rounded-xl text-xs w-full hover:bg-gray-100 transition-colors"
+                  className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-1 rounded-xl text-xs w-full hover:bg-gray-100 transition-colors"
                   onClick={() => onReferenceSelect("live", liveJob)}
                 >
                   Use as reference
@@ -347,7 +347,7 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
             {liveJobs.slice(2).map((liveJob) => (
               <div
                 key={liveJob.id}
-                className={`border border-gray-200 rounded-xl bg-white p-3 shadow-lg cursor-pointer ${
+                className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ${
                   extJob?.id === liveJob.id ? "ring-2 shadow-xl" : ""
                 }`}
                 style={{
@@ -369,11 +369,11 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
                       </h3>
                     </div>
                     <div className="text-xs text-gray-600">
-                      <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
+                      <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-0.5 rounded-full">
                         {liveJob.source}
                       </span>{" "}
                       • {liveJob.city} •{" "}
-                      <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
+                      <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-0.5 rounded-full">
                         {freshness(liveJob.ageHours)}
                       </span>
                     </div>
@@ -384,14 +384,14 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
                         href={liveJob.url}
                         target="_blank"
                         rel="noopener"
-                        className="border border-gray-200 bg-gray-50 px-3 py-1 rounded-xl text-xs hover:bg-gray-100 transition-colors"
+                        className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-1 rounded-xl text-xs hover:bg-gray-100 transition-colors"
                         onClick={(e) => e.stopPropagation()}
                       >
                         Open ↗
                       </a>
                     </div>
                     <button
-                      className="border border-gray-200 bg-gray-50 px-3 py-1 rounded-xl text-xs w-full hover:bg-gray-100 transition-colors"
+                      className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-1 rounded-xl text-xs w-full hover:bg-gray-100 transition-colors"
                       onClick={() => onReferenceSelect("live", liveJob)}
                     >
                       Use as reference
@@ -406,7 +406,7 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
         {liveJobs.length > 2 && (
           <button
             onClick={() => setShowMoreLive(!showMoreLive)}
-            className="border border-gray-200 bg-gray-50 px-4 py-2 rounded-xl w-full hover:bg-gray-100 transition-colors"
+            className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-2 rounded-xl w-full hover:bg-gray-100 transition-colors"
           >
             {showMoreLive ? "Hide live jobs" : "Show more live jobs"}
           </button>
@@ -464,7 +464,7 @@ function AISnapshotSection({ job, extJob, onReferenceSelect }) {
         <h2 className="text-lg font-bold text-gray-800">AI job snapshot</h2>
         <button
           onClick={() => setShowGuideSnap(!showGuideSnap)}
-          className="border border-gray-200 bg-gray-50 px-2 py-1 rounded-full text-xs cursor-pointer hover:bg-gray-100 transition-colors"
+          className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-1 rounded-full text-xs cursor-pointer hover:bg-gray-100 transition-colors"
           aria-pressed={showGuideSnap}
         >
           ? Tips
@@ -472,7 +472,7 @@ function AISnapshotSection({ job, extJob, onReferenceSelect }) {
       </div>
 
       {showGuideSnap && (
-        <div className="border border-gray-200 rounded-xl bg-gray-50 p-3 mb-2">
+        <div className="border border-gray-200 rounded-xl bg-gray-50 p-2 md:p-4 mb-2">
           <div className="font-bold mb-1">When we use the snapshot</div>
           <ul className="space-y-1 ml-4 text-sm">
             <li>
@@ -488,7 +488,7 @@ function AISnapshotSection({ job, extJob, onReferenceSelect }) {
       )}
 
       <div
-        className={`border border-gray-200 rounded-xl bg-white p-4 shadow-lg cursor-pointer ${
+        className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ${
           !extJob ? "ring-2 shadow-xl" : ""
         }`}
         style={{
@@ -551,11 +551,11 @@ function AISnapshotSection({ job, extJob, onReferenceSelect }) {
             placeholder="Paste a job link (optional) — we'll cite it in your first line"
             value={linkValue}
             onChange={(e) => setLinkValue(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-200 rounded-xl bg-white text-sm"
+            className="flex-1 px-2 md:px-4 py-2 border border-gray-200 rounded-xl bg-white text-sm"
           />
           <button
             onClick={handleSaveLink}
-            className="border border-gray-200 bg-gray-50 px-3 py-2 rounded-xl text-sm hover:bg-gray-100 transition-colors"
+            className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-2 rounded-xl text-sm hover:bg-gray-100 transition-colors"
           >
             Save
           </button>
@@ -577,7 +577,7 @@ function AISnapshotSection({ job, extJob, onReferenceSelect }) {
         <div className="flex justify-end mt-3">
           <button
             onClick={() => onReferenceSelect("snapshot")}
-            className="border border-gray-200 bg-gray-50 px-4 py-2 rounded-xl hover:bg-gray-100 transition-colors"
+            className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-2 rounded-xl hover:bg-gray-100 transition-colors"
           >
             Use snapshot as reference
           </button>
@@ -597,7 +597,7 @@ function OfferSection({ extras, extrasLabels, onExtraToggle, quality }) {
         <h2 className="text-lg font-bold text-gray-800">What can you offer?</h2>
         <button
           onClick={() => setShowGuideOffer(!showGuideOffer)}
-          className="border border-gray-200 bg-gray-50 px-2 py-1 rounded-full text-xs cursor-pointer hover:bg-gray-100 transition-colors"
+          className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-1 rounded-full text-xs cursor-pointer hover:bg-gray-100 transition-colors"
           aria-pressed={showGuideOffer}
         >
           ? Tips
@@ -605,7 +605,7 @@ function OfferSection({ extras, extrasLabels, onExtraToggle, quality }) {
       </div>
 
       {showGuideOffer && (
-        <div className="border border-gray-200 rounded-xl bg-gray-50 p-3 mb-2">
+        <div className="border border-gray-200 rounded-xl bg-gray-50 p-2 md:p-4 mb-2">
           <div className="font-bold mb-1">What HR reacts to</div>
           <ul className="space-y-1 ml-4 text-sm">
             <li>Night shifts or immediate start (specific availability).</li>
@@ -615,13 +615,13 @@ function OfferSection({ extras, extrasLabels, onExtraToggle, quality }) {
         </div>
       )}
 
-      <div className="border border-gray-200 rounded-xl bg-white p-4 shadow-lg">
+      <div className="border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg">
         <div className="flex justify-between items-center mb-2">
           <p className="text-xs text-gray-500">
             Pick 1–3 extras — HR replies faster when you're specific.
           </p>
           <span
-            className={`text-xs border rounded-full px-2 py-1 ${
+            className={`text-xs border rounded-full px-2 md:px-4 py-1 ${
               quality.class === "q-ready"
                 ? "bg-green-50 border-green-200 text-green-700"
                 : quality.class === "q-ok"
@@ -638,7 +638,7 @@ function OfferSection({ extras, extrasLabels, onExtraToggle, quality }) {
             <button
               key={key}
               onClick={() => onExtraToggle(key)}
-              className={`border rounded-full px-3 py-2 text-xs cursor-pointer transition-colors ${
+              className={`border rounded-full px-2 md:px-4 py-2 text-xs cursor-pointer transition-colors ${
                 extras.has(key)
                   ? "border-yellow-300 bg-gradient-to-b from-yellow-100 to-white font-semibold"
                   : "border-gray-200 bg-gray-50 hover:bg-gray-100"
@@ -664,16 +664,16 @@ function ReadySummarySection({
   return (
     <section>
       <h2 className="text-lg font-bold text-gray-800 mb-2">Ready to send</h2>
-      <div className="border border-gray-200 rounded-xl bg-white p-4 shadow-lg space-y-2">
+      <div className="border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg space-y-2">
         <div className="flex justify-between items-center">
           <span className="font-bold">Contact</span>
           <span className="text-sm">
             {selectedContact.initials} • {selectedContact.role} —{" "}
             {selectedContact.city}{" "}
-            <span className="ml-1 border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full text-xs">
+            <span className="ml-1 border border-gray-300 bg-gray-50 px-2 md:px-4 py-0.5 rounded-full text-xs">
               Reply {selectedContact.reply}%
             </span>{" "}
-            <span className="ml-1 border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full text-xs">
+            <span className="ml-1 border border-gray-300 bg-gray-50 px-2 md:px-4 py-0.5 rounded-full text-xs">
               Active: {selectedContact.active}
             </span>
           </span>
@@ -699,13 +699,13 @@ function ReadySummarySection({
                 .map((label) => (
                   <span
                     key={label}
-                    className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full text-xs whitespace-nowrap"
+                    className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-0.5 rounded-full text-xs whitespace-nowrap"
                   >
                     {label}
                   </span>
                 ))
             ) : (
-              <span className="border border-gray-300 bg-gray-50 px-2 py-0.5 rounded-full text-xs">
+              <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-0.5 rounded-full text-xs">
                 —
               </span>
             )}
@@ -714,7 +714,7 @@ function ReadySummarySection({
         <div className="flex justify-between items-center">
           <span className="font-bold">Quality</span>
           <span
-            className={`text-sm border rounded-full px-2 py-0.5 text-xs ${
+            className={`text-sm border rounded-full px-2 md:px-4 py-0.5 text-xs ${
               quality.class === "q-ready"
                 ? "bg-green-50 border-green-200 text-green-700"
                 : "bg-gray-50 border-gray-300"
@@ -731,11 +731,11 @@ function ReadySummarySection({
 // Sticky Apply Footer Component
 function StickyApplyFooter({ company, selectedContact }) {
   return (
-    <div className="fixed left-0 right-0 bottom-0 z-50 bg-white border-t border-gray-200 p-3 shadow-lg">
+    <div className="fixed left-0 right-0 bottom-0 z-50 bg-white border-t border-gray-200 p-2 shadow-lg">
       <div className="container max-w-screen-md mx-auto">
         <div className="flex flex-col gap-2 mb-2">
           <button
-            className="flex-1 border border-gray-300 text-white font-bold px-4 py-3 rounded-xl shadow-lg text-center"
+            className="flex-1 border border-gray-300 text-white font-bold px-2 md:px-4 py-2 rounded-xl shadow-lg text-center"
             style={{
               backgroundColor: company.color || "#e7e7e7",
             }}
@@ -873,9 +873,9 @@ const JobDetailsClient = ({ job }) => {
   const quality = getQuality();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-2 text-gray-600 text-sm pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-2 md:px-4 py-2 text-gray-600 text-sm pb-8">
       <div className="container max-w-screen-md mx-auto">
-        <div className="bg-white shadow-lg overflow-hidden py-4 px-4">
+        <div className="bg-white shadow-lg overflow-hidden p-2 md:p-4">
           <JobHeroSection job={job} contacts={contacts} liveJobs={liveJobs} />
 
           <ContactsSection

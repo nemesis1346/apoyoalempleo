@@ -1,7 +1,7 @@
 import CompanyCardSkeleton from "./CompanyCardSkeleton";
 
 const PageSkeleton = () => (
-  <div className="bg-white shadow-lg p-4">
+  <div className="bg-white shadow-lg p-2 md:p-4">
     <h2 className="text-[#222] text-[18px] font-bold mb-1">Companies</h2>
 
     {/* Skeleton for search section */}

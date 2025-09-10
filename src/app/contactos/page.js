@@ -99,12 +99,12 @@ export default function ContactsPage() {
   }, [pagination.limit, loadContacts]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-2">
-      <div className="container max-w-screen-md mx-auto py-2">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-2 md:p-4">
+      <div className="container max-w-screen-md mx-auto">
         {loading && <PageSkeleton />}
 
         {!loading && (
-          <div className="bg-white shadow-lg p-4">
+          <div className="bg-white shadow-lg p-2 md:p-4">
             {/* Title */}
             <h2 className="text-[#222] text-[18px] font-bold mb-1">Contacts</h2>
 

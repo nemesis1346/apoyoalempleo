@@ -172,7 +172,7 @@ export default function CompanyDetailsClient({ params }) {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-2">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-2 md:p-4">
         <div className="container max-w-screen-md mx-auto py-2">
           <div className="bg-white shadow-lg p-4 rounded-lg">
             <div className="text-center py-8">
@@ -194,7 +194,7 @@ export default function CompanyDetailsClient({ params }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-2">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-2 md:p-4">
       <div className="container max-w-screen-md mx-auto py-2">
         {/* Breadcrumb Navigation */}
         <div className="mb-4">
@@ -222,12 +222,12 @@ export default function CompanyDetailsClient({ params }) {
           </nav>
         </div>
 
-        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden p-2 md:p-4">
           {/* Company Hero Section */}
           <CompanyHero company={company} />
 
           {/* Jobs Section */}
-          <div className="p-4">
+          <div className="p-2 md:p-4">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-[#222] text-[18px] font-bold">
                 Open Positions
@@ -256,7 +256,7 @@ export default function CompanyDetailsClient({ params }) {
                 {Array.from({ length: 3 }).map((_, index) => (
                   <div
                     key={index}
-                    className="animate-pulse flex gap-2 items-center p-2 border-1 border-[#0001] shadow-lg rounded-lg"
+                    className="animate-pulse flex gap-2 items-center p-2 md:p-4 border-1 border-[#0001] shadow-lg rounded-lg"
                   >
                     <div className="min-w-[75px] h-[75px] bg-gray-300 rounded-lg"></div>
                     <div className="flex flex-col gap-2 w-full">

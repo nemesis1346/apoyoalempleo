@@ -13,7 +13,7 @@ const CompanyCard = ({ company }) => {
   return (
     <div className="flex flex-col border-1 border-[#e7e7e7] shadow-[0 8px 24px rgba(0, 0, 0, .06)] rounded-lg">
       <div
-        className="flex items-center justify-center h-28 border-b rounded-t-lg p-4"
+        className="flex items-center justify-center h-28 border-b rounded-t-lg p-2 md:p-4"
         style={{
           borderBottomColor: company.color || "#e7e7e7",
           background: `
@@ -33,7 +33,7 @@ const CompanyCard = ({ company }) => {
           className="h-22 w-auto rounded-lg"
         />
       </div>
-      <div className="flex flex-col gap-2 p-4">
+      <div className="flex flex-col gap-2 p-2 md:p-4">
         <div
           className="text-lg text-gray-700 font-semibold hover:underline cursor-pointer"
           onClick={() => navigateCompanyDetails(company)}

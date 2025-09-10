@@ -46,9 +46,9 @@ export default function JobDetailsPageClient({ params }) {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-2">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-2 md:px-4 py-2">
         <div className="container max-w-screen-md mx-auto py-2">
-          <div className="bg-white shadow-lg p-4 rounded-lg">
+          <div className="bg-white shadow-lg p-2 md:p-4 rounded-lg">
             <div className="text-center py-8">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
                 Job Not Found
@@ -69,9 +69,9 @@ export default function JobDetailsPageClient({ params }) {
 
   if (!job) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-2">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-2 md:px-4 py-2">
         <div className="container max-w-screen-md mx-auto py-2">
-          <div className="bg-white shadow-lg p-4 text-center">
+          <div className="bg-white shadow-lg p-2 md:p-4 text-center">
             <h1 className="text-xl font-bold text-gray-800 mb-2">
               Job Not Found
             </h1>
@@ -80,7 +80,7 @@ export default function JobDetailsPageClient({ params }) {
             </p>
             <Link
               href="/empleos"
-              className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-xl font-bold hover:bg-yellow-300 transition-colors"
+              className="bg-yellow-400 text-yellow-900 px-2 md:px-4 py-2 rounded-xl font-bold hover:bg-yellow-300 transition-colors"
             >
               Browse All Jobs
             </Link>

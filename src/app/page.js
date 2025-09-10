@@ -7,7 +7,7 @@ import { useState } from "react";
 // Hero Section Component
 function HeroSection() {
   return (
-    <header className="relative border border-gray-200 rounded-2xl bg-white shadow-lg overflow-hidden p-4 mb-4">
+    <header className="relative border border-gray-200 rounded-2xl bg-white shadow-lg overflow-hidden px-2 md:px-4 py-4 mb-4">
       <div className="absolute left-0 right-0 top-0 h-32 z-0 bg-gradient-to-b from-yellow-400 via-yellow-300 to-yellow-100 opacity-90 border-b border-yellow-300"></div>
 
       <div className="relative z-10">
@@ -53,13 +53,13 @@ function HeroSection() {
         <div className="flex gap-2 flex-wrap">
           <Link
             href="/guia"
-            className="flex-1 bg-gradient-to-b from-yellow-300 to-yellow-400 border border-yellow-300 text-yellow-900 font-black px-4 py-3 rounded-xl shadow-lg hover:from-yellow-400 hover:to-yellow-500 transition-all text-center"
+            className="flex-1 bg-gradient-to-b from-yellow-300 to-yellow-400 border border-yellow-300 text-yellow-900 font-black px-2 md:px-4 py-3 rounded-xl shadow-lg hover:from-yellow-400 hover:to-yellow-500 transition-all text-center"
           >
             How to get started
           </Link>
           <Link
             href="/empleos"
-            className="flex-1 border border-gray-200 bg-gray-50 px-4 py-3 rounded-xl text-gray-700 font-semibold hover:bg-gray-100 transition-colors text-center"
+            className="flex-1 border border-gray-200 bg-gray-50 px-2 md:px-4 py-3 rounded-xl text-gray-700 font-semibold hover:bg-gray-100 transition-colors text-center"
           >
             See nearby jobs
           </Link>
@@ -122,7 +122,7 @@ function HowItWorksSection() {
         {steps.map((step) => (
           <div
             key={step.number}
-            className="border border-gray-200 rounded-xl bg-white p-3 shadow-lg"
+            className="border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg"
           >
             <div className="grid grid-cols-[42px_1fr] gap-3 items-start">
               <div className="w-10 h-10 rounded-xl bg-yellow-100 border border-yellow-300 font-black text-yellow-900 flex items-center justify-center">
@@ -143,7 +143,7 @@ function HowItWorksSection() {
 // Support Section Component
 function SupportSection() {
   return (
-    <section className="border border-gray-200 rounded-xl bg-white shadow-lg p-4">
+    <section className="border border-gray-200 rounded-xl bg-white shadow-lg p-2 md:p-4">
       <h2 className="text-lg font-bold text-gray-800 mb-2">
         ❓ Do you need any help?
       </h2>
@@ -151,10 +151,10 @@ function SupportSection() {
         We respond fast — choose the contact method that fits you best:
       </p>
 
-      <div className="grid md:grid-cols-2 gap-3 mb-4">
+      <div className="grid md:grid-cols-2 gap-2 md:gap-4 mb-4">
         <a
           href="mailto:support@apoyoalempleo.com"
-          className="flex gap-3 items-center justify-center p-3 border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-gray-700"
+          className="flex gap-3 items-center justify-center p-2 md:p-4 border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-gray-700"
         >
           <span className="text-lg">📧</span>
           <span className="font-semibold">Email support</span>
@@ -163,7 +163,7 @@ function SupportSection() {
           href="https://wa.me/1234567890"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex gap-3 items-center justify-center p-3 border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-gray-700"
+          className="flex gap-3 items-center justify-center p-2 md:p-4 border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-gray-700"
         >
           <span className="text-lg">💬</span>
           <span className="font-semibold">Chat on WhatsApp</span>
@@ -214,7 +214,7 @@ function QuickAccessSection() {
           <Link
             key={index}
             href={link.href}
-            className="border border-gray-200 rounded-xl bg-white p-4 shadow-lg hover:shadow-xl transition-all group"
+            className="border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg hover:shadow-xl transition-all group"
           >
             <div className="flex items-center gap-3">
               <div className="text-2xl">{link.icon}</div>
@@ -250,7 +250,7 @@ function StatsSection() {
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="border border-gray-200 rounded-xl bg-white p-3 text-center shadow-lg"
+            className="border border-gray-200 rounded-xl bg-white p-2 md:p-4 text-center shadow-lg"
           >
             <div className="text-xl font-black text-yellow-600">
               {stat.number}
@@ -272,7 +272,7 @@ function StickyCTAFooter() {
           <div className="flex gap-2 flex-col md:flex-row">
             <Link
               href="/guia"
-              className="flex-1 bg-gradient-to-b from-yellow-300 to-yellow-400 border border-yellow-300 text-yellow-900 font-black px-4 py-3 rounded-xl shadow-lg hover:from-yellow-400 hover:to-yellow-500 transition-all text-center min-w-0"
+              className="flex-1 bg-gradient-to-b from-yellow-300 to-yellow-400 border border-yellow-300 text-yellow-900 font-black px-2 md:px-4 py-2 rounded-xl shadow-lg hover:from-yellow-400 hover:to-yellow-500 transition-all text-center min-w-0"
             >
               Unlock 2 verified contacts
             </Link>

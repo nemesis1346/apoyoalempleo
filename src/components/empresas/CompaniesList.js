@@ -2,7 +2,7 @@ import CompanyCard from "./CompanyCard";
 import CompanyCardSkeleton from "./CompanyCardSkeleton";
 
 const CompaniesList = ({ companies, loadingMore }) => (
-  <div className="space-y-4">
+  <div className="space-y-2 md:space-y-4">
     {companies.map((company, index) => (
       <CompanyCard key={index} company={company} />
     ))}

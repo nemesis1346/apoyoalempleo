@@ -35,7 +35,7 @@ function HowItWorksSection() {
         {steps.map((step) => (
           <article
             key={step.number}
-            className="border border-gray-200 rounded-xl bg-white p-2 shadow-lg"
+            className="border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg"
           >
             <div className="grid grid-cols-[42px_1fr] gap-2 items-start">
               <div className="w-10 h-10 rounded-xl bg-yellow-100 border border-yellow-300 font-black text-yellow-800 flex items-center justify-center">
@@ -60,7 +60,7 @@ function WhyThisWorksSection() {
       <h2 className="text-gray-800 text-lg font-bold mb-1">
         🔐 Why this works (no fluff. just direct contact.)
       </h2>
-      <article className="border border-gray-200 rounded-xl bg-white p-4 shadow-lg">
+      <article className="border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg">
         <p className="font-medium mb-2 text-gray-800">
           Portals show postings. We show <u>the person who decides</u>.
         </p>
@@ -140,7 +140,7 @@ function ProofSection() {
       </p>
 
       <div className="grid md:grid-cols-2 gap-4 mb-4">
-        <article className="border border-gray-200 rounded-xl bg-white p-3 shadow-lg">
+        <article className="border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg">
           <span className="inline-block px-2 py-1 rounded-full bg-red-50 border border-red-200 text-red-800 text-xs mb-2">
             Before — job portal
           </span>
@@ -152,7 +152,7 @@ function ProofSection() {
           </div>
         </article>
 
-        <article className="border border-gray-200 rounded-xl bg-white p-3 shadow-lg">
+        <article className="border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg">
           <span className="inline-block px-2 py-1 rounded-full bg-green-50 border border-green-200 text-green-800 text-xs mb-2">
             After — direct HR
           </span>
@@ -325,13 +325,13 @@ function FAQSection() {
               className="border-t border-gray-200 first:border-t-0"
             >
               <details className="group">
-                <summary className="flex items-center gap-2 p-3 font-bold cursor-pointer hover:bg-gray-50 transition-colors text-gray-700">
+                <summary className="flex items-center gap-2 p-2 md:p-4 font-bold cursor-pointer hover:bg-gray-50 transition-colors text-gray-700">
                   <span className="flex-1 text-gray-700">{faq.question}</span>
                   <span className="inline-block px-2 py-1 rounded-full border border-gray-300 bg-gray-50 text-xs ml-auto text-gray-700">
                     {faq.badge}
                   </span>
                 </summary>
-                <div className="px-3 leading-relaxed">
+                <div className="px-2 md:px-4 leading-relaxed">
                   {typeof faq.answer === "string" ? (
                     <p>{faq.answer}</p>
                   ) : (
@@ -394,7 +394,7 @@ const JobsSection = () => {
       {!loading && jobs?.length > 0 ? (
         <JobsList jobs={jobs} isLoading={loading} />
       ) : (
-        <div className="border border-gray-200 rounded-xl bg-gray-50 p-2 text-center">
+        <div className="border border-gray-200 rounded-xl bg-gray-50 p-2 md:p-4 text-center">
           <div className="mb-1">
             <svg
               className="w-12 h-12 mx-auto text-gray-400"
@@ -423,7 +423,7 @@ const JobsSection = () => {
       <div className="flex justify-center mt-4">
         <Link
           href="/empleos"
-          className="bg-[#f0f0f0] text-sm text-black px-4 py-2 rounded-md border-none transition-all duration-200 cursor-pointer hover:bg-[#e0e0e0]"
+          className="bg-[#f0f0f0] text-sm text-black px-2 md:px-4 py-2 rounded-md border-none transition-all duration-200 cursor-pointer hover:bg-[#e0e0e0]"
         >
           Show all in your city
         </Link>
@@ -435,9 +435,9 @@ const JobsSection = () => {
 // Main Guide Page Component
 export default function GuidePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-2 text-gray-600 text-sm">
-      <div className="container max-w-screen-md mx-auto py-2">
-        <div className="bg-white shadow-lg p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-2 md:p-4 text-gray-600 text-sm">
+      <div className="container max-w-screen-md mx-auto">
+        <div className="bg-white shadow-lg p-2 md:p-4">
           <HowItWorksSection />
           <JobsSection />
           <WhyThisWorksSection />

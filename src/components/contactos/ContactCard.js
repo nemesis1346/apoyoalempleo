@@ -99,7 +99,7 @@ const ContactCard = ({ contact }) => {
   return (
     <div className="flex flex-col border-1 border-[#e7e7e7] shadow-[0 8px 24px rgba(0, 0, 0, .06)] rounded-lg">
       <div
-        className="flex items-center justify-center h-28 border-b rounded-t-lg p-4"
+        className="flex items-center justify-center h-28 border-b rounded-t-lg p-2 md:p-4"
         style={{
           borderBottomColor: currentContact.company?.color || "#e7e7e7",
           background: `
@@ -119,7 +119,7 @@ const ContactCard = ({ contact }) => {
           className="h-22 w-auto rounded-lg"
         />
       </div>
-      <div className="flex flex-col gap-2 p-4">
+      <div className="flex flex-col gap-2 p-2 md:p-4">
         <div className="flex items-center gap-2 text-lg text-gray-700 font-semibold">
           {!isUnlocked && (
             <div className="relative">
@@ -153,7 +153,7 @@ const ContactCard = ({ contact }) => {
 
         {/* Contact Details */}
         <div
-          className="flex gap-2 w-full rounded-lg py-2 px-2 border-1 flex-col md:flex-row md:justify-evenly items-start md:items-center flex-wrap whitespace-nowrap overflow-x-hidden"
+          className="flex gap-2 w-full rounded-lg py-2 px-2 md:px-4 border-1 flex-col md:flex-row md:justify-evenly items-start md:items-center flex-wrap whitespace-nowrap overflow-x-hidden"
           style={{
             borderColor: currentContact.company?.color || "#e7e7e7",
           }}
@@ -219,7 +219,7 @@ const ContactCard = ({ contact }) => {
           </div>
         </div>
         {!isUnlocked ? (
-          <div className="flex mt-2">
+          <div className="flex">
             <button
               onClick={handleUnlockClick}
               disabled={checkingStatus}
