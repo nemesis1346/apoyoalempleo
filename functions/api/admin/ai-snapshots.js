@@ -318,7 +318,7 @@ async function createAISnapshot(request, env, user) {
         market_insights, salary_range, required_skills,
         application_tips, company_specific_tips,
         priority, created_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const result = await stmt
@@ -337,11 +337,13 @@ async function createAISnapshot(request, env, user) {
       )
       .run();
 
+    const snapshotId = result.meta.last_row_id;
+
     return createResponse(
       {
         success: true,
         data: {
-          id: result.meta.last_row_id,
+          id: snapshotId,
           ...data,
           created_by: user.id,
         },

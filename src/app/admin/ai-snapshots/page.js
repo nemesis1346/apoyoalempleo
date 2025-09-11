@@ -7,6 +7,7 @@ import { adminService } from "../../../services/adminService";
 export default function AISnapshotsPage() {
   const { user } = useAuth();
   const [snapshots, setSnapshots] = useState([]);
+  const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -88,6 +89,19 @@ export default function AISnapshotsPage() {
       setError("Failed to fetch AI snapshots");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Load jobs for selection
+  const loadJobs = async () => {
+    try {
+      const response = await adminService.jobs.getAll({ limit: 100 });
+      if (response.success) {
+        setJobs(response.data || []);
+      }
+    } catch (err) {
+      console.error("Load jobs error:", err);
+      setJobs([]);
     }
   };
 
@@ -202,6 +216,13 @@ export default function AISnapshotsPage() {
       city: "",
       country: "",
       employment_type: "",
+      market_insights: "",
+      salary_range: "",
+      required_skills: "",
+      application_tips: "",
+      company_specific_tips: "",
+      priority: 0,
+      is_active: true,
     });
   };
 
@@ -219,6 +240,7 @@ export default function AISnapshotsPage() {
   useEffect(() => {
     if (user) {
       loadSnapshots(pagination.page);
+      loadJobs();
     }
   }, [user, pagination.page, filters]);
 

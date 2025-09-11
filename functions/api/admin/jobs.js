@@ -145,9 +145,11 @@ async function getJobs(env, user, url) {
 
     // Get paginated results
     const stmt = env.DB.prepare(`
-      SELECT j.*, c.name as company_name, c.logo_url as company_logo_url, c.color as company_color
+      SELECT j.*, c.name as company_name, c.logo_url as company_logo_url, c.color as company_color,
+             ai.job_title as snapshot_job_title
       FROM jobs j
       LEFT JOIN companies c ON j.company_id = c.id
+      LEFT JOIN ai_snapshots ai ON j.snapshot_id = ai.id
       ${whereClause}
       ORDER BY j.created_at DESC
       LIMIT ? OFFSET ?
@@ -200,7 +202,13 @@ async function getJobs(env, user, url) {
 
     // Parse location JSON arrays in results and add chips
     const jobs = results.map((job) => {
-      const { company_logo_url, company_color, company_name, ...jobItem } = job;
+      const {
+        company_logo_url,
+        company_color,
+        company_name,
+        snapshot_job_title,
+        ...jobItem
+      } = job;
       return {
         ...jobItem,
         location: job.location ? JSON.parse(job.location) : [],
@@ -210,6 +218,11 @@ async function getJobs(env, user, url) {
           logo_url: company_logo_url,
           color: company_color,
         },
+        ai_snapshot: snapshot_job_title
+          ? {
+              job_title: snapshot_job_title,
+            }
+          : null,
       };
     });
 
@@ -302,9 +315,22 @@ async function createJob(request, env, user) {
       }
     }
 
+    // Clear existing relationships before creating new job (to avoid UNIQUE constraint violation)
+    if (data.snapshot_id) {
+      const snapshotId = parseInt(data.snapshot_id);
+      // Clear any existing job that has this snapshot_id
+      await env.DB.prepare(
+        `
+        UPDATE jobs SET snapshot_id = NULL WHERE snapshot_id = ?
+      `,
+      )
+        .bind(snapshotId)
+        .run();
+    }
+
     const stmt = env.DB.prepare(`
-      INSERT INTO jobs (company_id, title, employment_type, location, description)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO jobs (company_id, title, employment_type, location, description, snapshot_id)
+      VALUES (?, ?, ?, ?, ?, ?)
     `);
 
     const result = await stmt
@@ -314,6 +340,7 @@ async function createJob(request, env, user) {
         data.employment_type || null,
         locationJson,
         data.description || null,
+        data.snapshot_id || null,
       )
       .run();
 
@@ -326,6 +353,12 @@ async function createJob(request, env, user) {
       data.chip_ids.length > 0
     ) {
       await updateJobChips(env, jobId, data.chip_ids);
+    }
+
+    // Handle bidirectional AI snapshot relationship
+    if (data.snapshot_id) {
+      const snapshotId = parseInt(data.snapshot_id);
+      await updateAISnapshotJobRelationship(env, jobId, snapshotId);
     }
 
     return createResponse(
@@ -354,9 +387,11 @@ async function createJob(request, env, user) {
 async function getJob(jobId, env, user) {
   try {
     const stmt = env.DB.prepare(`
-      SELECT j.*, c.name as company_name, c.logo_url as company_logo_url, c.color as company_color
+      SELECT j.*, c.name as company_name, c.logo_url as company_logo_url, c.color as company_color,
+             ai.job_title as snapshot_job_title
       FROM jobs j
       LEFT JOIN companies c ON j.company_id = c.id
+      LEFT JOIN ai_snapshots ai ON j.snapshot_id = ai.id
       WHERE j.id = ?
     `);
 
@@ -390,7 +425,13 @@ async function getJob(jobId, env, user) {
     chipResults = result.results || [];
 
     // Parse location JSON array
-    const { company_logo_url, company_color, company_name, ...jobItem } = job;
+    const {
+      company_logo_url,
+      company_color,
+      company_name,
+      snapshot_job_title,
+      ...jobItem
+    } = job;
     job.location = job.location ? JSON.parse(job.location) : [];
     job.chips = chipResults || [];
     job.company = {
@@ -398,9 +439,15 @@ async function getJob(jobId, env, user) {
       logo_url: company_logo_url,
       color: company_color,
     };
+    job.ai_snapshot = snapshot_job_title
+      ? {
+          job_title: snapshot_job_title,
+        }
+      : null;
     delete job.company_logo_url;
     delete job.company_color;
     delete job.company_name;
+    delete job.snapshot_job_title;
 
     return createResponse({ success: true, data: job });
   } catch (error) {
@@ -492,9 +539,22 @@ async function updateJob(jobId, request, env, user) {
       }
     }
 
+    // Clear existing relationships before updating job (to avoid UNIQUE constraint violation)
+    if (data.snapshot_id !== undefined && data.snapshot_id) {
+      const snapshotId = parseInt(data.snapshot_id);
+      // Clear any existing job that has this snapshot_id (except the current job)
+      await env.DB.prepare(
+        `
+        UPDATE jobs SET snapshot_id = NULL WHERE snapshot_id = ? AND id != ?
+      `,
+      )
+        .bind(snapshotId, jobId)
+        .run();
+    }
+
     const stmt = env.DB.prepare(`
       UPDATE jobs 
-      SET title = ?, employment_type = ?, location = ?, description = ?, updated_at = datetime('now')
+      SET title = ?, employment_type = ?, location = ?, description = ?, snapshot_id = ?, updated_at = datetime('now')
       WHERE id = ?
     `);
 
@@ -504,6 +564,7 @@ async function updateJob(jobId, request, env, user) {
         data.employment_type || null,
         locationJson,
         data.description || null,
+        data.snapshot_id || null,
         jobId,
       )
       .run();
@@ -515,6 +576,12 @@ async function updateJob(jobId, request, env, user) {
     // Handle chips update
     if (data.chip_ids !== undefined) {
       await updateJobChips(env, jobId, data.chip_ids || []);
+    }
+
+    // Handle bidirectional AI snapshot relationship
+    if (data.snapshot_id !== undefined) {
+      const snapshotId = data.snapshot_id ? parseInt(data.snapshot_id) : null;
+      await updateAISnapshotJobRelationship(env, jobId, snapshotId);
     }
 
     return createResponse({
@@ -603,6 +670,43 @@ async function updateJobChips(env, jobId, chipIds) {
     }
   } catch (error) {
     console.error("Update job chips error:", error);
+    throw error;
+  }
+}
+
+// Helper function to maintain bidirectional AI snapshot relationship
+async function updateAISnapshotJobRelationship(env, jobId, snapshotId) {
+  try {
+    if (snapshotId) {
+      // Clear any existing relationship for this job (in ai_snapshots)
+      await env.DB.prepare(
+        `
+        UPDATE ai_snapshots SET parent_job_id = NULL WHERE parent_job_id = ? AND id != ?
+      `,
+      )
+        .bind(jobId, snapshotId)
+        .run();
+
+      // Set the bidirectional relationship in ai_snapshots
+      await env.DB.prepare(
+        `
+        UPDATE ai_snapshots SET parent_job_id = ? WHERE id = ?
+      `,
+      )
+        .bind(jobId, snapshotId)
+        .run();
+    } else {
+      // Clear existing relationship for this job
+      await env.DB.prepare(
+        `
+        UPDATE ai_snapshots SET parent_job_id = NULL WHERE parent_job_id = ?
+      `,
+      )
+        .bind(jobId)
+        .run();
+    }
+  } catch (error) {
+    console.error("Update AI snapshot job relationship error:", error);
     throw error;
   }
 }

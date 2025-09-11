@@ -11,6 +11,7 @@ export default function AdminJobsPage() {
   const [jobs, setJobs] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [chips, setChips] = useState({});
+  const [aiSnapshots, setAiSnapshots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -39,6 +40,7 @@ export default function AdminJobsPage() {
     location: [],
     description: "",
     chip_ids: [], // Selected chip IDs
+    snapshot_id: "", // Selected AI snapshot ID
   });
 
   // Load jobs
@@ -113,6 +115,23 @@ export default function AdminJobsPage() {
     }
   }, []);
 
+  // Load AI snapshots for selection
+  const loadAiSnapshots = useCallback(async () => {
+    try {
+      const response = await adminService.aiSnapshots.getAll({ limit: 100 });
+
+      if (response.success) {
+        setAiSnapshots(response.data || []);
+      } else {
+        setError(response.error || "Failed to fetch AI snapshots");
+      }
+    } catch (err) {
+      console.error("Load AI snapshots error:", err);
+      setError(err.message || "Failed to fetch AI snapshots");
+      setAiSnapshots([]);
+    }
+  }, []);
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -121,7 +140,7 @@ export default function AdminJobsPage() {
       setSubmitting(true);
       setError(null);
 
-      // Prepare job data including chip IDs
+      // Prepare job data including chip IDs and snapshot ID
       const jobData = {
         company_id: formData.company_id,
         title: formData.title,
@@ -129,6 +148,7 @@ export default function AdminJobsPage() {
         location: formData.location,
         description: formData.description,
         chip_ids: formData.chip_ids,
+        snapshot_id: formData.snapshot_id || null,
       };
 
       let response;
@@ -144,6 +164,7 @@ export default function AdminJobsPage() {
         );
         resetForm();
         loadJobs();
+        loadAiSnapshots();
       } else {
         setError(response.error || "Operation failed");
       }
@@ -168,6 +189,7 @@ export default function AdminJobsPage() {
       if (response.success) {
         setSuccess("Job deleted successfully");
         loadJobs();
+        loadAiSnapshots();
       } else {
         setError(response.error || "Failed to delete job");
       }
@@ -188,6 +210,7 @@ export default function AdminJobsPage() {
       location: [],
       description: "",
       chip_ids: [],
+      snapshot_id: "",
     });
     setEditingJob(null);
     setShowForm(false);
@@ -202,6 +225,7 @@ export default function AdminJobsPage() {
       location: Array.isArray(job.location) ? job.location : [],
       description: job.description || "",
       chip_ids: job.chips ? job.chips.map((c) => c.id) : [],
+      snapshot_id: job.snapshot_id || "",
     });
     setEditingJob(job);
     setShowForm(true);
@@ -222,6 +246,16 @@ export default function AdminJobsPage() {
   const clearMessages = () => {
     setError(null);
     setSuccess(null);
+  };
+
+  // Get snapshot label
+  const getSnapShotLabel = (snapshot) => {
+    const snapshot_job = jobs.find((job) => job.snapshot_id === snapshot.id);
+    const job_company_name = snapshot_job?.company?.name || undefined;
+    return `${job_company_name ? `${job_company_name} - ` : ""}${
+      snapshot.job_title ||
+      `${snapshot.city || "General"} - ${snapshot.country || "All Countries"}`
+    } ${snapshot.employment_type && ` (${snapshot.employment_type})`}`;
   };
 
   // Filter companies based on user role
@@ -256,6 +290,7 @@ export default function AdminJobsPage() {
       loadJobs();
       loadCompanies();
       loadChips();
+      loadAiSnapshots();
     }
   }, [
     user,
@@ -265,6 +300,7 @@ export default function AdminJobsPage() {
     loadJobs,
     loadCompanies,
     loadChips,
+    loadAiSnapshots,
   ]);
 
   useEffect(() => {
@@ -405,6 +441,9 @@ export default function AdminJobsPage() {
                         Location
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        AI Snapshot
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Created
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -442,6 +481,15 @@ export default function AdminJobsPage() {
                           job.location.length > 0
                             ? job.location.join(", ")
                             : "-"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {job.ai_snapshot ? (
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                              {job.ai_snapshot.job_title || "Linked"}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">No snapshot</span>
+                          )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {job.created_at
@@ -519,7 +567,7 @@ export default function AdminJobsPage() {
                       <select
                         value={formData.company_id}
                         onChange={(e) => handleCompanyChange(e.target.value)}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
+                        className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
                         required
                       >
                         <option value={null}>Select Company *</option>
@@ -545,7 +593,7 @@ export default function AdminJobsPage() {
                             title: e.target.value,
                           }))
                         }
-                        className="w-full border border-gray-300 rounded-lg px-4 py-1.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
+                        className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
                         required
                       />
                     </div>
@@ -562,7 +610,7 @@ export default function AdminJobsPage() {
                             employment_type: e.target.value,
                           }))
                         }
-                        className="w-full border border-gray-300 rounded-lg px-4 py-1.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
+                        className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
                         required
                       >
                         <option value="">Select Employment Type</option>
@@ -571,6 +619,29 @@ export default function AdminJobsPage() {
                         <option value="contract">Contract</option>
                         <option value="internship">Internship</option>
                         <option value="temporary">Temporary</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        AI Snapshot
+                      </label>
+                      <select
+                        value={formData.snapshot_id}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            snapshot_id: e.target.value,
+                          }))
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                      >
+                        <option value="">No AI Snapshot</option>
+                        {aiSnapshots.map((snapshot) => (
+                          <option key={snapshot.id} value={snapshot.id}>
+                            {getSnapShotLabel(snapshot)}
+                          </option>
+                        ))}
                       </select>
                     </div>
 
@@ -632,7 +703,7 @@ export default function AdminJobsPage() {
                         }))
                       }
                       rows="4"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
+                      className="w-full border border-gray-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
                       required
                     ></textarea>
                   </div>
