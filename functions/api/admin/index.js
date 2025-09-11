@@ -111,9 +111,9 @@ async function handleStats(method, request, env, user) {
       jobsCount,
       childJobsCount,
       aiSnapshotsCount,
+      chipsCount,
       contactsCount,
       usersCount;
-    chipsCount;
 
     if (user.role === "super_admin") {
       // Super admin sees all stats
