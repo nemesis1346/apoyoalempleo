@@ -14,24 +14,18 @@ export default function AISnapshotsPage() {
   const [editingSnapshot, setEditingSnapshot] = useState(null);
   const [formData, setFormData] = useState({
     job_title: "",
-    city: "",
-    country: "",
     employment_type: "",
     market_insights: "",
     salary_range: "",
     required_skills: "",
     application_tips: "",
     company_specific_tips: "",
-    priority: 0,
     is_active: true,
   });
 
   // Pagination and filtering
   const [filters, setFilters] = useState({
     search: "",
-    job_title: "",
-    city: "",
-    country: "",
     employment_type: "",
   });
 
@@ -41,16 +35,6 @@ export default function AISnapshotsPage() {
     total: 0,
     totalPages: 0,
   });
-
-  const validCountries = [
-    "Mexico",
-    "Peru",
-    "Argentina",
-    "Chile",
-    "Colombia",
-    "Ecuador",
-    "Uruguay",
-  ];
 
   const validEmploymentTypes = [
     "full-time",
@@ -189,8 +173,6 @@ export default function AISnapshotsPage() {
     setEditingSnapshot(snapshot);
     setFormData({
       job_title: snapshot.job_title || "",
-      city: snapshot.city || "",
-      country: snapshot.country || "",
       employment_type: snapshot.employment_type || "",
       market_insights: snapshot.market_insights
         ? JSON.stringify(snapshot.market_insights, null, 2)
@@ -203,7 +185,6 @@ export default function AISnapshotsPage() {
         : "",
       application_tips: snapshot.application_tips || "",
       company_specific_tips: snapshot.company_specific_tips || "",
-      priority: snapshot.priority || 0,
       is_active: snapshot.is_active,
     });
     setShowForm(true);
@@ -213,15 +194,12 @@ export default function AISnapshotsPage() {
   const resetForm = () => {
     setFormData({
       job_title: "",
-      city: "",
-      country: "",
       employment_type: "",
       market_insights: "",
       salary_range: "",
       required_skills: "",
       application_tips: "",
       company_specific_tips: "",
-      priority: 0,
       is_active: true,
     });
   };
@@ -292,7 +270,7 @@ export default function AISnapshotsPage() {
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <input
                 type="text"
@@ -300,47 +278,9 @@ export default function AISnapshotsPage() {
                 onChange={(e) =>
                   handleFilterChange({ ...filters, search: e.target.value })
                 }
-                placeholder="Search job title, city..."
+                placeholder="Search job title"
                 className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500 w-full"
               />
-            </div>
-            <div>
-              <input
-                type="text"
-                value={filters.job_title}
-                onChange={(e) =>
-                  handleFilterChange({ ...filters, job_title: e.target.value })
-                }
-                placeholder="Specific job title"
-                className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500 w-full"
-              />
-            </div>
-            <div>
-              <input
-                type="text"
-                value={filters.city}
-                onChange={(e) =>
-                  handleFilterChange({ ...filters, city: e.target.value })
-                }
-                placeholder="City"
-                className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500 w-full"
-              />
-            </div>
-            <div>
-              <select
-                value={filters.country}
-                onChange={(e) =>
-                  handleFilterChange({ ...filters, country: e.target.value })
-                }
-                className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500 w-full"
-              >
-                <option value="">All Countries</option>
-                {validCountries.map((country) => (
-                  <option key={country} value={country}>
-                    {country}
-                  </option>
-                ))}
-              </select>
             </div>
             <div>
               <select
@@ -380,9 +320,6 @@ export default function AISnapshotsPage() {
                       Targeting
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Priority
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Market Insights
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -406,33 +343,17 @@ export default function AISnapshotsPage() {
                               {snapshot.job_title}
                             </div>
                           )}
-                          {snapshot.city && (
-                            <div className="text-gray-500">{snapshot.city}</div>
-                          )}
-                          {snapshot.country && (
-                            <div className="text-gray-500">
-                              {snapshot.country}
-                            </div>
-                          )}
                           {snapshot.employment_type && (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-1">
                               {snapshot.employment_type}
                             </span>
                           )}
-                          {!snapshot.job_title &&
-                            !snapshot.city &&
-                            !snapshot.country &&
-                            !snapshot.employment_type && (
-                              <span className="text-gray-500 italic">
-                                Generic (Fallback)
-                              </span>
-                            )}
+                          {!snapshot.job_title && !snapshot.employment_type && (
+                            <span className="text-gray-500 italic">
+                              Generic (Fallback)
+                            </span>
+                          )}
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          {snapshot.priority}
-                        </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 max-w-xs">
                         {snapshot.market_insights && (
@@ -557,41 +478,6 @@ export default function AISnapshotsPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        City *
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.city}
-                        onChange={(e) =>
-                          setFormData({ ...formData, city: e.target.value })
-                        }
-                        placeholder="Leave empty for general"
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Country
-                      </label>
-                      <select
-                        value={formData.country}
-                        onChange={(e) =>
-                          setFormData({ ...formData, country: e.target.value })
-                        }
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
-                      >
-                        <option value="">Leave empty for general</option>
-                        {validCountries.map((country) => (
-                          <option key={country} value={country}>
-                            {country}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Employment Type
                       </label>
                       <select
@@ -611,24 +497,6 @@ export default function AISnapshotsPage() {
                           </option>
                         ))}
                       </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Priority
-                      </label>
-                      <input
-                        type="number"
-                        value={formData.priority}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            priority: parseInt(e.target.value) || 0,
-                          })
-                        }
-                        min="0"
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder:text-gray-500"
-                      />
                     </div>
 
                     <div>

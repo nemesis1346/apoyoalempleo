@@ -253,8 +253,7 @@ export default function AdminJobsPage() {
     const snapshot_job = jobs.find((job) => job.snapshot_id === snapshot.id);
     const job_company_name = snapshot_job?.company?.name || undefined;
     return `${job_company_name ? `${job_company_name} - ` : ""}${
-      snapshot.job_title ||
-      `${snapshot.city || "General"} - ${snapshot.country || "All Countries"}`
+      snapshot.job_title
     } ${snapshot.employment_type && ` (${snapshot.employment_type})`}`;
   };
 

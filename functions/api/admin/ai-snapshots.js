@@ -318,7 +318,7 @@ async function createAISnapshot(request, env, user) {
         market_insights, salary_range, required_skills,
         application_tips, company_specific_tips,
         priority, created_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const result = await stmt
@@ -581,6 +581,15 @@ async function deleteAISnapshot(snapshotId, env, user) {
 
     const stmt = env.DB.prepare("DELETE FROM ai_snapshots WHERE id = ?");
     const result = await stmt.bind(snapshotId).run();
+
+    // Clear any existing relationship for this snapshot
+    await env.DB.prepare(
+      `
+      UPDATE jobs SET snapshot_id = NULL WHERE snapshot_id = ?
+    `,
+    )
+      .bind(snapshotId)
+      .run();
 
     if (result.changes === 0) {
       return createResponse({ error: "AI snapshot not found" }, 404);

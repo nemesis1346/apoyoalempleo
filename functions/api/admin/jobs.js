@@ -628,6 +628,15 @@ async function deleteJob(jobId, env, user) {
     const stmt = env.DB.prepare("DELETE FROM jobs WHERE id = ?");
     const result = await stmt.bind(jobId).run();
 
+    // Clear any existing relationship for this job
+    await env.DB.prepare(
+      `
+      UPDATE ai_snapshots SET parent_job_id = NULL WHERE parent_job_id = ?
+    `,
+    )
+      .bind(jobId)
+      .run();
+
     if (result.changes === 0) {
       return createResponse({ error: "Job not found" }, 404);
     }
