@@ -15,6 +15,7 @@ export default function JobDetailsPageClient({ params }) {
   const [company, setCompany] = useState(null);
   const [childJobs, setChildJobs] = useState([]);
   const [aiSnapshot, setAiSnapshot] = useState(null);
+  const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
@@ -31,6 +32,7 @@ export default function JobDetailsPageClient({ params }) {
         setCompany(response.data.company || {});
         setChildJobs([...response.data.childJobs] || []);
         setAiSnapshot(response.data.aiSnapshot || null);
+        setContacts(response.data.contacts || []);
       } else {
         setError(response.error || "Failed to load job details");
       }
@@ -102,6 +104,7 @@ export default function JobDetailsPageClient({ params }) {
       company={company}
       childJobs={childJobs}
       aiSnapshot={aiSnapshot}
+      contacts={contacts}
     />
   );
 }

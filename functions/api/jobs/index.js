@@ -9,7 +9,6 @@ export async function handleJobsRequest(request, env) {
 
   // Extract job ID from path: /api/jobs/{jobId}
   const jobId = pathParts[2];
-  console.log("Job ID: ", jobId);
 
   // Only GET requests allowed for public API
   if (method !== "GET") {
@@ -212,6 +211,20 @@ async function getJob(jobId, env) {
     `);
     const aiSnapshot = await aiSnapshotStmt.bind(jobId).first();
 
+    // Get Contacts for this job's company
+    const contactsStmt = env.DB.prepare(`
+      SELECT * FROM contacts WHERE company_id = ?
+    `);
+    const { results: contactsResults } = await contactsStmt
+      .bind(job.company_id)
+      .all();
+    const contacts = contactsResults.map((contact) => {
+      return {
+        ...contact,
+        location: contact.location ? JSON.parse(contact.location) : [],
+      };
+    });
+
     return createResponse({
       success: true,
       data: {
@@ -230,6 +243,7 @@ async function getJob(jobId, env) {
             ? JSON.parse(aiSnapshot.required_skills)
             : null,
         },
+        contacts,
       },
     });
   } catch (error) {

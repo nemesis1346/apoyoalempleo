@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import ApplyNowModal from "../../../components/ApplyNowModal";
 
 // Job Hero Section Component
 function JobHeroSection({ job, company, contactsLength, childJobsLength }) {
@@ -107,6 +108,15 @@ function ContactsSection({
   const [showMoreContacts, setShowMoreContacts] = useState(false);
   const [showGuideHR, setShowGuideHR] = useState(false);
 
+  const getInitials = (name) => {
+    if (!name) return "??";
+    return name
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase())
+      .join("")
+      .slice(0, 2);
+  };
+
   return (
     <section className="mb-4">
       <div className="flex items-center gap-2 mb-2">
@@ -136,113 +146,126 @@ function ContactsSection({
         </div>
       )}
 
-      <div
-        className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ${
-          selectedContactId === "p1" ? "ring-2 shadow-xl" : ""
-        } mb-2`}
-        style={{
-          ...(selectedContactId === "p1" && {
-            "--tw-ring-color": company.color || "#e7e7e7",
-            "--tw-ring-opacity": "1",
-          }),
-        }}
-        onClick={() => onContactSelect("p1")}
-      >
-        <div className="grid grid-cols-[56px_1fr_auto] gap-2 items-center">
-          <div className="flex h-full">
-            <div
-              className="w-14 h-14 rounded-xl border border-gray-300 flex items-center justify-center font-black text-white text-nowrap"
-              style={{
-                backgroundColor: company.color || "#e7e7e7",
-              }}
-            >
-              {contacts[0].initials}
-            </div>
-          </div>
-          <div>
-            <h3 className="font-bold text-gray-800 mb-2">
-              👤 Name: {contacts[0].initials} 🔒
-            </h3>
-            <div className="flex md:flex-row gap-1 text-xs text-gray-600 font-bold mb-1">
-              <div>📧 Email: 🔒</div>
-              <div className="hidden md:block">•</div>
-              <div>📞 Phone: 🔒</div>
-            </div>
-            <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
-              <span className="text-gray-600 font-bold">
-                {contacts[0].city} •{" "}
-              </span>
-              <span className="border border-gray-300 bg-gray-50 px-1 py-0.5 rounded-full">
-                Active: {contacts[0].active}
-              </span>
-            </div>
-          </div>
-          <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-1 rounded-full text-xs text-nowrap">
-            {selectedContactId === "p1" ? "Selected" : "Tap to select"}
-          </span>
-        </div>
-      </div>
-
-      <button
-        onClick={() => setShowMoreContacts(!showMoreContacts)}
-        className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-2 rounded-xl w-full hover:bg-gray-100 transition-colors"
-      >
-        {showMoreContacts ? "Hide contacts" : "Show more contacts"}
-      </button>
-
-      {showMoreContacts && (
-        <div className="space-y-2 mt-2">
-          {contacts.slice(1).map((contact) => (
-            <div
-              key={contact.id}
-              className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ${
-                selectedContactId === contact.id ? "ring-2 shadow-xl" : ""
-              }`}
-              style={{
-                ...(selectedContactId === contact.id && {
-                  "--tw-ring-color": company.color || "#e7e7e7",
-                  "--tw-ring-opacity": "1",
-                }),
-              }}
-              onClick={() => onContactSelect(contact.id)}
-            >
-              <div className="grid grid-cols-[56px_1fr_auto] gap-2 items-center">
-                <div className="flex h-full">
-                  <div
-                    className="w-14 h-14 rounded-xl border border-gray-300 flex items-center justify-center font-black text-white text-nowrap"
-                    style={{
-                      backgroundColor: company.color || "#e7e7e7",
-                    }}
-                  >
-                    {contact.initials}
-                  </div>
+      {contacts?.length > 0 && (
+        <div>
+          <div
+            className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ${
+              selectedContactId === "p1" ? "ring-2 shadow-xl" : ""
+            } mb-2`}
+            style={{
+              ...(selectedContactId === "p1" && {
+                "--tw-ring-color": company.color || "#e7e7e7",
+                "--tw-ring-opacity": "1",
+              }),
+            }}
+            onClick={() => onContactSelect("p1")}
+          >
+            <div className="grid grid-cols-[56px_1fr_auto] gap-2 items-center">
+              <div className="flex h-full">
+                <div
+                  className="w-14 h-14 rounded-xl border border-gray-300 flex items-center justify-center font-black text-white text-nowrap"
+                  style={{
+                    backgroundColor: company.color || "#e7e7e7",
+                  }}
+                >
+                  {getInitials(contacts[0].name)}
                 </div>
-                <div>
-                  <h3 className="font-bold text-gray-800 mb-2">
-                    👤 Name: {contact.initials} 🔒
-                  </h3>
-                  <div className="flex md:flex-row gap-1 text-xs text-gray-600 font-bold mb-1">
-                    <div>📧 Email: 🔒</div>
-                    <div className="hidden md:block">•</div>
-                    <div>📞 Phone: 🔒</div>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
-                    <span className="text-gray-600 font-bold">
-                      {contact.city} •{" "}
-                    </span>
-                    <span className="border border-gray-300 bg-gray-50 px-1 py-0.5 rounded-full">
-                      Active: {contact.active}
-                    </span>
-                  </div>
-                </div>
-                <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-1 rounded-full text-xs">
-                  {selectedContactId === contact.id
-                    ? "Selected"
-                    : "Tap to select"}
-                </span>
               </div>
+              <div>
+                <h3 className="font-bold text-gray-800 mb-2">
+                  👤 Name: {getInitials(contacts[0].name)} 🔒
+                </h3>
+                <div className="flex md:flex-row gap-1 text-xs text-gray-600 font-bold mb-1">
+                  <div>📧 Email: 🔒</div>
+                  <div className="hidden md:block">•</div>
+                  <div>📞 Phone: 🔒</div>
+                </div>
+                <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
+                  <span className="text-gray-600 font-bold">
+                    {contacts[0].city} •{" "}
+                  </span>
+                  <span className="border border-gray-300 bg-gray-50 px-1 py-0.5 rounded-full">
+                    Active: {contacts[0].active}
+                  </span>
+                </div>
+              </div>
+              <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-1 rounded-full text-xs text-nowrap">
+                {selectedContactId === "p1" ? "Selected" : "Tap to select"}
+              </span>
             </div>
-          ))}
+          </div>
+
+          <button
+            onClick={() => setShowMoreContacts(!showMoreContacts)}
+            className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-2 rounded-xl w-full hover:bg-gray-100 transition-colors"
+          >
+            {showMoreContacts ? "Hide contacts" : "Show more contacts"}
+          </button>
+
+          {showMoreContacts && (
+            <div className="space-y-2 mt-2">
+              {contacts.slice(1).map((contact) => (
+                <div
+                  key={contact.id}
+                  className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ${
+                    selectedContactId === contact.id ? "ring-2 shadow-xl" : ""
+                  }`}
+                  style={{
+                    ...(selectedContactId === contact.id && {
+                      "--tw-ring-color": company.color || "#e7e7e7",
+                      "--tw-ring-opacity": "1",
+                    }),
+                  }}
+                  onClick={() => onContactSelect(contact.id)}
+                >
+                  <div className="grid grid-cols-[56px_1fr_auto] gap-2 items-center">
+                    <div className="flex h-full">
+                      <div
+                        className="w-14 h-14 rounded-xl border border-gray-300 flex items-center justify-center font-black text-white text-nowrap"
+                        style={{
+                          backgroundColor: company.color || "#e7e7e7",
+                        }}
+                      >
+                        {getInitials(contact.name)}
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-800 mb-2">
+                        👤 Name: {getInitials(contact.name)} 🔒
+                      </h3>
+                      <div className="flex md:flex-row gap-1 text-xs text-gray-600 font-bold mb-1">
+                        <div>📧 Email: 🔒</div>
+                        <div className="hidden md:block">•</div>
+                        <div>📞 Phone: 🔒</div>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
+                        <span className="text-gray-600 font-bold">
+                          {contact.city} •{" "}
+                        </span>
+                        <span className="border border-gray-300 bg-gray-50 px-1 py-0.5 rounded-full">
+                          Active: {contact.active}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-1 rounded-full text-xs">
+                      {selectedContactId === contact.id
+                        ? "Selected"
+                        : "Tap to select"}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {contacts?.length == 0 && (
+        <div className="flex items-center justify-center py-2 px-4 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-600">
+          <div className="text-center">
+            <div className="text-gray-400 mb-1">👥</div>
+            <div>No contacts found for this company.</div>
+          </div>
         </div>
       )}
 
@@ -387,7 +410,7 @@ function LiveListingsSection({
               <div className="space-y-2">
                 <div>
                   <a
-                    href={liveJob.url}
+                    href={liveJob.link}
                     target="_blank"
                     rel="noopener"
                     className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-1 rounded-xl text-xs hover:bg-gray-100 transition-colors"
@@ -482,7 +505,7 @@ function LiveListingsSection({
 }
 
 // AI Job Snapshot Section Component
-function AISnapshotSection({ job, extJob, onReferenceSelect }) {
+function AISnapshotSection({ job, company, aiSnapshot, onReferenceSelect }) {
   const [showGuideSnap, setShowGuideSnap] = useState(false);
   const [linkValue, setLinkValue] = useState("");
   const [linkFeedback, setLinkFeedback] = useState({
@@ -553,14 +576,10 @@ function AISnapshotSection({ job, extJob, onReferenceSelect }) {
       )}
 
       <div
-        className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ${
-          !extJob ? "ring-2 shadow-xl" : ""
-        }`}
+        className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ring-2 shadow-xl`}
         style={{
-          ...(!extJob && {
-            "--tw-ring-color": "#3b82f6", // Using blue color for AI snapshot
-            "--tw-ring-opacity": "1",
-          }),
+          "--tw-ring-color": company.color || "#3b82f6",
+          "--tw-ring-opacity": "1",
         }}
         onClick={() => onReferenceSelect("snapshot")}
       >
@@ -569,34 +588,58 @@ function AISnapshotSection({ job, extJob, onReferenceSelect }) {
           a link if you want us to cite a current listing in your first line.
         </p>
 
-        <div className="grid md:grid-cols-2 gap-4 mb-4">
+        <div className="grid md:grid-cols-2 gap-2 md:gap-4 mb-4">
           <div>
-            <div className="font-bold mb-2">Requirements</div>
-            <ul className="text-sm space-y-1">
-              {(
-                job?.requirements || [
-                  "Certificado de vigilancia (vigente)",
-                  "Turnos rotativos / noche",
-                  "Antecedentes limpios",
-                  "Buena comunicación al cliente",
-                ]
-              ).map((req, i) => (
+            <div className="font-bold mb-1">Application Tips</div>
+            <div className="text-xs space-y-1">
+              {aiSnapshot?.application_tips}
+            </div>
+          </div>
+          <div>
+            <div className="font-bold mb-1">Company Specific Tips</div>
+            <div className="text-xs space-y-1">
+              {aiSnapshot?.company_specific_tips}
+            </div>
+          </div>
+          <div>
+            <div className="font-bold mb-1">Required Skills</div>
+            <ul className="text-xs space-y-1">
+              {(aiSnapshot?.required_skills || []).map((req, i) => (
                 <li key={i}>• {req}</li>
               ))}
             </ul>
           </div>
           <div>
-            <div className="font-bold mb-2">Nice to have</div>
-            <ul className="text-sm space-y-1">
-              {(
-                job?.nice_to_have || [
-                  "Experiencia en CCTV / monitoreo",
-                  "Licencia de moto A2",
-                  "Curso primeros auxilios",
-                ]
-              ).map((nice, i) => (
-                <li key={i}>• {nice}</li>
-              ))}
+            <div className="font-bold mb-1">Salary Range</div>
+            <div className="text-xs space-y-1">
+              <div>
+                <span className="font-semibold">Min:</span>{" "}
+                {aiSnapshot?.salary_range?.min || ""}
+              </div>
+              <div>
+                <span className="font-semibold">Max:</span>{" "}
+                {aiSnapshot?.salary_range?.max || ""}
+              </div>
+              <div>
+                <span className="font-semibold">Currency:</span>{" "}
+                {aiSnapshot?.salary_range?.currency || ""}
+              </div>
+              <div>
+                <span className="font-semibold">Period:</span>{" "}
+                {aiSnapshot?.salary_range?.period || ""}
+              </div>
+            </div>
+          </div>
+          <div>
+            <div className="font-bold mb-1">Market Insights</div>
+            <ul className="text-xs space-y-1">
+              {(Object.entries(aiSnapshot?.market_insights || {}) || []).map(
+                ([key, value], i) => (
+                  <li key={i}>
+                    • <span className="font-semibold">{key}:</span> {value}
+                  </li>
+                ),
+              )}
             </ul>
           </div>
         </div>
@@ -642,7 +685,7 @@ function AISnapshotSection({ job, extJob, onReferenceSelect }) {
         <div className="flex justify-end mt-3">
           <button
             onClick={() => onReferenceSelect("snapshot")}
-            className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-2 rounded-xl hover:bg-gray-100 transition-colors"
+            className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-1.5 rounded-xl hover:bg-gray-100 transition-colors"
           >
             Use snapshot as reference
           </button>
@@ -794,13 +837,14 @@ function ReadySummarySection({
 }
 
 // Sticky Apply Footer Component
-function StickyApplyFooter({ company, selectedContact }) {
+function StickyApplyFooter({ company, selectedContact, onApplyClick }) {
   return (
     <div className="fixed left-0 right-0 bottom-0 z-50 bg-white border-t border-gray-200 p-2 shadow-lg">
       <div className="container max-w-screen-md mx-auto">
         <div className="flex flex-col gap-2 mb-2">
           <button
-            className="flex-1 border border-gray-300 text-white font-bold px-2 md:px-4 py-2 rounded-xl shadow-lg text-center"
+            onClick={onApplyClick}
+            className="flex-1 border border-gray-300 text-white font-bold px-2 md:px-4 py-2 rounded-xl shadow-lg text-center hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
             style={{
               backgroundColor: company.color || "#e7e7e7",
             }}
@@ -818,44 +862,17 @@ function StickyApplyFooter({ company, selectedContact }) {
 }
 
 // Main Component
-const JobDetailsClient = ({ job, company, childJobs, aiSnapshot }) => {
+const JobDetailsClient = ({
+  job,
+  company,
+  childJobs,
+  aiSnapshot,
+  contacts,
+}) => {
   const [selectedContactId, setSelectedContactId] = useState("p1");
   const [extJob, setExtJob] = useState(null);
   const [extras, setExtras] = useState(new Set(["nights", "start"]));
-
-  // Mock data - in real app this would come from API
-  const contacts = [
-    {
-      id: "p1",
-      initials: "JG",
-      role: "HR",
-      company: company?.name || "Company",
-      city: "Bogotá",
-      reply: 78,
-      active: "today",
-      domain: `@${company?.name?.toLowerCase()}.com`,
-    },
-    {
-      id: "p2",
-      initials: "MA",
-      role: "TA",
-      company: company?.name || "Company",
-      city: "Medellín",
-      reply: 82,
-      active: "yesterday",
-      domain: `@${company?.name?.toLowerCase()}.com`,
-    },
-    {
-      id: "p3",
-      initials: "LC",
-      role: "HR",
-      company: company?.name || "Company",
-      city: "Bogotá",
-      reply: 74,
-      active: "≤7d",
-      domain: `@${company?.name?.toLowerCase()}.com`,
-    },
-  ];
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
   const extrasLabels = {
     nights: "night shifts",
@@ -910,6 +927,14 @@ const JobDetailsClient = ({ job, company, childJobs, aiSnapshot }) => {
     contacts.find((c) => c.id === selectedContactId) || contacts[0];
   const quality = getQuality();
 
+  const handleApplyClick = () => {
+    setIsApplyModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsApplyModalOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-2 md:px-4 py-2 text-gray-600 text-sm pb-8">
       <div className="container max-w-screen-md mx-auto">
@@ -940,7 +965,8 @@ const JobDetailsClient = ({ job, company, childJobs, aiSnapshot }) => {
           {!childJobs?.length > 0 && aiSnapshot && (
             <AISnapshotSection
               job={job}
-              extJob={extJob}
+              company={company}
+              aiSnapshot={aiSnapshot}
               onReferenceSelect={handleReferenceSelect}
             />
           )}
@@ -962,7 +988,22 @@ const JobDetailsClient = ({ job, company, childJobs, aiSnapshot }) => {
         </div>
       </div>
 
-      <StickyApplyFooter company={company} selectedContact={selectedContact} />
+      <StickyApplyFooter
+        company={company}
+        selectedContact={selectedContact}
+        onApplyClick={handleApplyClick}
+      />
+
+      <ApplyNowModal
+        isOpen={isApplyModalOpen}
+        onClose={handleCloseModal}
+        job={job}
+        company={company}
+        selectedContact={selectedContact}
+        extJob={extJob}
+        extras={extras}
+        extrasLabels={extrasLabels}
+      />
     </div>
   );
 };
