@@ -72,6 +72,19 @@ const ApplyNowModal = ({ isOpen, onClose, job, company, selectedContact }) => {
     }
   }, [isOpen]);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   // Animate vacancy counter
   const animateVacancies = () => {
     const targetVacancies = Math.floor(Math.random() * 30) + 15; // Random 15-45
@@ -253,7 +266,12 @@ const ApplyNowModal = ({ isOpen, onClose, job, company, selectedContact }) => {
         className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-200 ${
           isOpen ? "opacity-100" : "opacity-0"
         }`}
-        onClick={onClose}
+        onClick={(e) => {
+          // Only close if clicking the backdrop itself, not its children
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        }}
       />
 
       {/* Modal */}
@@ -262,14 +280,29 @@ const ApplyNowModal = ({ isOpen, onClose, job, company, selectedContact }) => {
           isOpen ? "translate-y-0" : "translate-y-full"
         }`}
         style={dynamicStyles}
+        onClick={(e) => {
+          // Prevent modal content clicks from bubbling up to backdrop
+          e.stopPropagation();
+        }}
       >
         {/* Handle */}
         <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-3 mb-2" />
 
         {/* Close button */}
         <button
-          onClick={onClose}
-          className="absolute right-4 top-4 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 text-xl"
+          type="button"
+          onClick={() => {
+            console.log("Close button clicked"); // Debug log
+            onClose();
+          }}
+          className="absolute right-4 top-4 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200 text-gray-500 hover:text-gray-700 text-2xl transition-all duration-200 cursor-pointer"
+          aria-label="Close modal"
+          style={{
+            zIndex: 9999,
+            position: "absolute",
+            top: "16px",
+            right: "16px",
+          }}
         >
           ×
         </button>
@@ -279,6 +312,7 @@ const ApplyNowModal = ({ isOpen, onClose, job, company, selectedContact }) => {
           className="sticky top-0 z-10 border border-gray-200 rounded-2xl mx-3 mb-4 p-4 shadow-lg"
           style={{
             background: `linear-gradient(180deg, var(--brand-soft) 0%, #ffffff 65%)`,
+            zIndex: 10,
           }}
         >
           <div className="flex items-center gap-4">
@@ -472,8 +506,13 @@ const ApplyNowModal = ({ isOpen, onClose, job, company, selectedContact }) => {
                       ✅ Yes, I want direct contact
                     </button>
                     <button
-                      onClick={onClose}
-                      className="w-full bg-white border-2 border-gray-300 text-gray-700 font-bold py-4 px-6 rounded-xl hover:bg-gray-50 transition-all duration-200"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        vibrate(5);
+                        onClose();
+                      }}
+                      className="w-full bg-white border-2 border-gray-300 text-gray-700 font-bold py-4 px-6 rounded-xl hover:bg-gray-50 transition-all duration-200 hover:scale-[0.98]"
                     >
                       ❌ No, I prefer to be ignored on job boards
                     </button>
