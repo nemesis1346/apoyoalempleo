@@ -4,7 +4,7 @@
 import { useState, useCallback, use, useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { adminService } from "../../../services";
+import { jobsService } from "../../../services/jobsService";
 import JobDetailsClient from "./JobDetailsClient";
 import JobDetailsSkeleton from "./JobDetailsSkeleton";
 
@@ -12,19 +12,25 @@ import JobDetailsSkeleton from "./JobDetailsSkeleton";
 export default function JobDetailsPageClient({ params }) {
   const { id } = use(params);
   const [job, setJob] = useState(null);
+  const [company, setCompany] = useState(null);
+  const [childJobs, setChildJobs] = useState([]);
+  const [aiSnapshot, setAiSnapshot] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  const fetchJob = useCallback(async () => {
+  const loadJobData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await adminService.jobs.getById(id);
+      const response = await jobsService.getJobById(id);
 
       if (response.success) {
-        setJob(response.data);
+        setJob(response.data.job || {});
+        setCompany(response.data.company || {});
+        setChildJobs([...response.data.childJobs] || []);
+        setAiSnapshot(response.data.aiSnapshot || null);
       } else {
         setError(response.error || "Failed to load job details");
       }
@@ -37,7 +43,7 @@ export default function JobDetailsPageClient({ params }) {
 
   // Effects
   useLayoutEffect(() => {
-    fetchJob();
+    loadJobData();
   }, [id]);
 
   if (loading) {
@@ -90,5 +96,12 @@ export default function JobDetailsPageClient({ params }) {
     );
   }
 
-  return <JobDetailsClient job={job} />;
+  return (
+    <JobDetailsClient
+      job={job}
+      company={company}
+      childJobs={childJobs}
+      aiSnapshot={aiSnapshot}
+    />
+  );
 }

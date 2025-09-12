@@ -51,12 +51,12 @@ apiClient.interceptors.request.use(
     }
 
     // Log requests in development
-    if (process.env.NODE_ENV === "development") {
-      console.log(
-        `🚀 ${config.method?.toUpperCase()} ${config.url}`,
-        config.data,
-      );
-    }
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log(
+    //     `🚀 ${config.method?.toUpperCase()} ${config.url}`,
+    //     config.data,
+    //   );
+    // }
 
     return config;
   },
@@ -70,12 +70,12 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => {
     // Log successful responses in development
-    if (process.env.NODE_ENV === "development") {
-      console.log(
-        `✅ ${response.config.method?.toUpperCase()} ${response.config.url}`,
-        response.data,
-      );
-    }
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log(
+    //     `✅ ${response.config.method?.toUpperCase()} ${response.config.url}`,
+    //     response.data,
+    //   );
+    // }
 
     return response;
   },

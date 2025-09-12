@@ -4,20 +4,18 @@
 import { useState } from "react";
 
 // Job Hero Section Component
-function JobHeroSection({ job, contacts, liveJobs }) {
+function JobHeroSection({ job, company, contactsLength, childJobsLength }) {
   return (
     <header
       className="mb-4 min-h-32 border-b p-2 md:p-4"
       style={{
-        borderBottomColor: job.company.color || "#e7e7e7",
+        borderBottomColor: company.color || "#e7e7e7",
         background: `
           linear-gradient(180deg, ${
-            job.company.color || "#e7e7e7"
+            company.color || "#e7e7e7"
           } 0 20%, transparent 20% 100%),
           radial-gradient(1000px 320px at 90% -80px, rgba(255,255,255,.14), rgba(255,255,255,0) 60%),
-          linear-gradient(180deg, ${
-            job.company.color || "#e7e7e7"
-          } 0 20%, #fff 85%)
+          linear-gradient(180deg, ${company.color || "#e7e7e7"} 0 20%, #fff 85%)
         `,
       }}
     >
@@ -26,12 +24,12 @@ function JobHeroSection({ job, contacts, liveJobs }) {
         <div
           className="bg-white rounded-lg shadow-md border-1 border-[#e7e7e7] shadow-[0 8px 24px rgba(0, 0, 0, .06)] w-20 h-20 flex-shrink-0 flex justify-center items-center"
           style={{
-            backgroundColor: job.company.color || "#e7e7e7",
+            backgroundColor: company.color || "#e7e7e7",
           }}
         >
           <img
-            src={job.company.logo_url || "/company-logo.png"}
-            alt={`${job.company.name} logo`}
+            src={company.logo_url || "/company-logo.png"}
+            alt={`${company.name} logo`}
             className="h-full w-full object-contain rounded-lg"
           />
         </div>
@@ -43,7 +41,7 @@ function JobHeroSection({ job, contacts, liveJobs }) {
           </h1>
 
           <div className="text-white text-sm font-semibold drop-shadow">
-            🏢 {job.company.name}
+            🏢 {company.name}
           </div>
 
           {/* Location */}
@@ -79,13 +77,13 @@ function JobHeroSection({ job, contacts, liveJobs }) {
         <div className="flex items-center p-2 md:p-4 rounded-lg bg-white border border-gray-300 w-22">
           <div className="flex flex-col text-xs">
             <span>Contacts</span>
-            <span className="font-bold">{contacts?.length || 0} verified</span>
+            <span className="font-bold">{contactsLength || 0} verified</span>
           </div>
         </div>
         <div className="flex items-center p-2 md:p-4 rounded-lg bg-white border border-gray-300 w-22">
           <div className="flex flex-col text-xs">
             <span>Live Listings</span>
-            <span className="font-bold">{liveJobs?.length || 0}</span>
+            <span className="font-bold">{childJobsLength || 0}</span>
           </div>
         </div>
         <div className="flex items-center p-2 md:p-4 rounded-lg bg-white border border-gray-300 w-22">
@@ -258,7 +256,12 @@ function ContactsSection({
 }
 
 // Live Listings Section Component
-function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
+function LiveListingsSection({
+  company,
+  childJobs,
+  extJob,
+  onReferenceSelect,
+}) {
   const [showMoreLive, setShowMoreLive] = useState(false);
 
   const freshness = (hours) => {
@@ -274,7 +277,7 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-bold text-gray-800">Live listings</h2>
           <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-0.5 rounded-full text-xs">
-            {liveJobs.length}
+            {childJobs.length}
           </span>
         </div>
         <span className="text-xs text-gray-500">
@@ -285,7 +288,7 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
       </div>
 
       <div className="space-y-2">
-        {liveJobs.slice(0, 2).map((liveJob) => (
+        {childJobs.slice(0, 2).map((liveJob) => (
           <div
             key={liveJob.id}
             className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ${
@@ -293,7 +296,7 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
             }`}
             style={{
               ...(extJob?.id === liveJob.id && {
-                "--tw-ring-color": "#10b981", // Using green color for live jobs to indicate "active"
+                "--tw-ring-color": company.color || "#e7e7e7",
                 "--tw-ring-opacity": "1",
               }),
             }}
@@ -309,14 +312,76 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
                     {liveJob.title}
                   </h3>
                 </div>
-                <div className="text-xs text-gray-600">
-                  <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-0.5 rounded-full">
-                    {liveJob.source}
-                  </span>{" "}
-                  • {liveJob.city} •{" "}
-                  <span className="border border-gray-300 bg-gray-50 px-2 md:px-4 py-0.5 rounded-full">
-                    {freshness(liveJob.ageHours)}
-                  </span>
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  {/* Location with icon */}
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-50 border border-gray-200 rounded-full text-gray-600 hover:bg-gray-100 transition-colors">
+                    <svg
+                      className="w-3 h-3 text-gray-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                    <span className="font-medium">{liveJob.city}</span>
+                  </div>
+
+                  {/* Source with enhanced styling */}
+                  <div
+                    className={`flex items-center gap-1.5 px-2 py-1 bg-gray-50 border border-gray-200 rounded-full text-gray-600 hover:bg-gray-100 transition-colors`}
+                  >
+                    <span>{liveJob.source}</span>
+                  </div>
+
+                  {/* Freshness with dynamic styling */}
+                  <div
+                    className={`flex items-center gap-1.5 px-2 py-1 bg-gray-50 border rounded-full font-medium transition-all ${
+                      (liveJob.ageHours || 0) <= 1
+                        ? "bg-emerald-50 border-emerald-200 text-emerald-700 shadow-sm"
+                        : (liveJob.ageHours || 0) <= 6
+                        ? "bg-green-50 border-green-200 text-green-700"
+                        : (liveJob.ageHours || 0) <= 24
+                        ? "bg-blue-50 border-blue-200 text-blue-700"
+                        : (liveJob.ageHours || 0) <= 48
+                        ? "bg-yellow-50 border-yellow-200 text-yellow-700"
+                        : "bg-gray-50 border-gray-200 text-gray-600"
+                    }`}
+                  >
+                    {(liveJob.ageHours || 0) <= 1 && (
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    )}
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <span>
+                      {(liveJob.ageHours || 0) <= 1
+                        ? "Just now"
+                        : (liveJob.ageHours || 0) <= 6
+                        ? "Fresh"
+                        : freshness(liveJob.ageHours || 0)}
+                    </span>
+                  </div>
                 </div>
               </div>
               <div className="space-y-2">
@@ -342,9 +407,9 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
           </div>
         ))}
 
-        {showMoreLive && liveJobs.length > 2 && (
+        {showMoreLive && childJobs.length > 2 && (
           <div className="space-y-2">
-            {liveJobs.slice(2).map((liveJob) => (
+            {childJobs.slice(2).map((liveJob) => (
               <div
                 key={liveJob.id}
                 className={`border border-gray-200 rounded-xl bg-white p-2 md:p-4 shadow-lg cursor-pointer ${
@@ -403,7 +468,7 @@ function LiveListingsSection({ liveJobs, extJob, onReferenceSelect }) {
           </div>
         )}
 
-        {liveJobs.length > 2 && (
+        {childJobs.length > 2 && (
           <button
             onClick={() => setShowMoreLive(!showMoreLive)}
             className="border border-gray-200 bg-gray-50 px-2 md:px-4 py-2 rounded-xl w-full hover:bg-gray-100 transition-colors"
@@ -753,7 +818,7 @@ function StickyApplyFooter({ company, selectedContact }) {
 }
 
 // Main Component
-const JobDetailsClient = ({ job }) => {
+const JobDetailsClient = ({ job, company, childJobs, aiSnapshot }) => {
   const [selectedContactId, setSelectedContactId] = useState("p1");
   const [extJob, setExtJob] = useState(null);
   const [extras, setExtras] = useState(new Set(["nights", "start"]));
@@ -764,58 +829,31 @@ const JobDetailsClient = ({ job }) => {
       id: "p1",
       initials: "JG",
       role: "HR",
-      company: job?.company?.name || "Company",
+      company: company?.name || "Company",
       city: "Bogotá",
       reply: 78,
       active: "today",
-      domain: `@${job?.company?.name?.toLowerCase()}.com`,
+      domain: `@${company?.name?.toLowerCase()}.com`,
     },
     {
       id: "p2",
       initials: "MA",
       role: "TA",
-      company: job?.company?.name || "Company",
+      company: company?.name || "Company",
       city: "Medellín",
       reply: 82,
       active: "yesterday",
-      domain: `@${job?.company?.name?.toLowerCase()}.com`,
+      domain: `@${company?.name?.toLowerCase()}.com`,
     },
     {
       id: "p3",
       initials: "LC",
       role: "HR",
-      company: job?.company?.name || "Company",
+      company: company?.name || "Company",
       city: "Bogotá",
       reply: 74,
       active: "≤7d",
-      domain: `@${job?.company?.name?.toLowerCase()}.com`,
-    },
-  ];
-
-  const liveJobs = [
-    {
-      id: "ct_901",
-      title: job?.title || "Job Title",
-      source: "Computrabajo",
-      url: "https://example.com/ct_901",
-      city: "Bogotá",
-      ageHours: 6,
-    },
-    {
-      id: "li_554",
-      title: job?.title || "Job Title",
-      source: "LinkedIn",
-      url: "https://example.com/li_554",
-      city: "Bogotá",
-      ageHours: 28,
-    },
-    {
-      id: "of_220",
-      title: job?.title || "Job Title",
-      source: "Official careers",
-      url: "https://example.com/of_220",
-      city: "Bogotá",
-      ageHours: 46,
+      domain: `@${company?.name?.toLowerCase()}.com`,
     },
   ];
 
@@ -876,26 +914,36 @@ const JobDetailsClient = ({ job }) => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-2 md:px-4 py-2 text-gray-600 text-sm pb-8">
       <div className="container max-w-screen-md mx-auto">
         <div className="bg-white shadow-lg overflow-hidden p-2 md:p-4">
-          <JobHeroSection job={job} contacts={contacts} liveJobs={liveJobs} />
+          <JobHeroSection
+            job={job}
+            company={company}
+            contactsLength={contacts?.length}
+            childJobsLength={childJobs?.length}
+          />
 
           <ContactsSection
-            company={job.company}
+            company={company}
             contacts={contacts}
             selectedContactId={selectedContactId}
             onContactSelect={handleContactSelect}
           />
 
-          <LiveListingsSection
-            liveJobs={liveJobs}
-            extJob={extJob}
-            onReferenceSelect={handleReferenceSelect}
-          />
+          {childJobs?.length > 0 && (
+            <LiveListingsSection
+              company={company}
+              childJobs={childJobs}
+              extJob={extJob}
+              onReferenceSelect={handleReferenceSelect}
+            />
+          )}
 
-          <AISnapshotSection
-            job={job}
-            extJob={extJob}
-            onReferenceSelect={handleReferenceSelect}
-          />
+          {!childJobs?.length > 0 && aiSnapshot && (
+            <AISnapshotSection
+              job={job}
+              extJob={extJob}
+              onReferenceSelect={handleReferenceSelect}
+            />
+          )}
 
           <OfferSection
             extras={extras}
@@ -914,10 +962,7 @@ const JobDetailsClient = ({ job }) => {
         </div>
       </div>
 
-      <StickyApplyFooter
-        company={job.company}
-        selectedContact={selectedContact}
-      />
+      <StickyApplyFooter company={company} selectedContact={selectedContact} />
     </div>
   );
 };

@@ -1,6 +1,5 @@
 import { createResponse } from "../../utils/cors.js";
 import { CloudflareCache } from "../../utils/cloudflare-cache.js";
-import { findBestAISnapshot } from "../admin/ai-snapshots.js";
 
 export async function handleJobsRequest(request, env) {
   const url = new URL(request.url);
@@ -10,48 +9,51 @@ export async function handleJobsRequest(request, env) {
 
   // Extract job ID from path: /api/jobs/{jobId}
   const jobId = pathParts[2];
+  console.log("Job ID: ", jobId);
 
   // Only GET requests allowed for public API
   if (method !== "GET") {
     return createResponse({ error: "Method not allowed" }, 405);
   }
 
-  // Handle caching for GET requests
-  const cacheKey = `${url.pathname}?${url.searchParams.toString()}`;
+  // // Handle caching for GET requests
+  // const cacheKey = `${url.pathname}?${url.searchParams.toString()}`;
 
-  // Try cache first for GET requests
-  const cached = await cache.get(request, cacheKey);
-  if (cached) {
-    return cached;
-  }
+  // // Try cache first for GET requests
+  // const cached = await cache.get(request, cacheKey);
+  // if (cached) {
+  //   return cached;
+  // }
 
   // Get fresh data
   let response;
   if (jobId) {
-    response = await getPublicJob(jobId, env);
+    response = await getJob(jobId, env);
   } else {
-    response = await getPublicJobs(env, url);
-  }
-
-  // Cache successful responses with longer TTL for public data
-  if (response.status === 200) {
-    const cacheSettings = {
-      maxAge: 600, // 10 minutes browser cache
-      sMaxAge: 1800, // 30 minutes edge cache
-      staleWhileRevalidate: 3600, // 1 hour stale allowed
-      publicCache: true, // Public cache for job listings
-    };
-    response = await cache.put(request, response, {
-      ...cacheSettings,
-      customKey: cacheKey,
-    });
+    response = await getJobs(env, url);
   }
 
   return response;
+
+  // // Cache successful responses with longer TTL for public data
+  // if (response.status === 200) {
+  //   const cacheSettings = {
+  //     maxAge: 600, // 10 minutes browser cache
+  //     sMaxAge: 1800, // 30 minutes edge cache
+  //     staleWhileRevalidate: 3600, // 1 hour stale allowed
+  //     publicCache: true, // Public cache for job listings
+  //   };
+  //   response = await cache.put(request, response, {
+  //     ...cacheSettings,
+  //     customKey: cacheKey,
+  //   });
+  // }
+
+  // return response;
 }
 
 // Public Jobs implementations
-async function getPublicJobs(env, url) {
+async function getJobs(env, url) {
   try {
     const params = new URLSearchParams(url?.search || "");
     const page = parseInt(params.get("page") || "1");
@@ -164,101 +166,70 @@ async function getPublicJobs(env, url) {
   }
 }
 
-async function getPublicJob(jobId, env) {
+async function getJob(jobId, env) {
   try {
     // Get main job details
     const jobStmt = env.DB.prepare(`
-      SELECT 
-        j.id, j.title, j.employment_type, j.location, j.description, j.created_at,
-        c.id as company_id, c.name as company_name, c.logo_url as company_logo_url, 
-        c.color as company_color, c.short_description as company_description
-      FROM jobs j
-      LEFT JOIN companies c ON j.company_id = c.id
-      WHERE j.id = ? AND c.is_active = ?
+      SELECT * FROM jobs j WHERE j.id = ?
     `);
 
-    const job = await jobStmt.bind(jobId, true).first();
+    const job = await jobStmt.bind(jobId).first();
 
     if (!job) {
       return createResponse({ error: "Job not found" }, 404);
     }
 
+    // Get company details
+    const companyStmt = env.DB.prepare(`
+      SELECT * FROM companies WHERE id = ?
+    `);
+    const company = await companyStmt.bind(job.company_id).first();
+
+    if (!company) {
+      console.warn(
+        `Company not found for job ${jobId}, company_id: ${job.company_id}`,
+      );
+    }
+
     // Get child jobs (external job listings)
     const childJobsStmt = env.DB.prepare(`
-      SELECT id, title, city, country, link, source, created_at
-      FROM child_jobs 
-      WHERE parent_job_id = ? AND is_active = ?
-      ORDER BY created_at DESC
+      SELECT * FROM child_jobs WHERE parent_job_id = ? ORDER BY created_at DESC
     `);
-    const { results: childJobsResults } = await childJobsStmt
-      .bind(jobId, true)
-      .all();
+    const { results: childJobsResults } = await childJobsStmt.bind(jobId).all();
 
-    // Get job offer chips
-    const chipsStmt = env.DB.prepare(`
-      SELECT joc.chip_key, joc.chip_label, joc.display_order
-      FROM job_offer_chips joc
-      WHERE joc.job_id = ? AND joc.is_active = ?
-      ORDER BY joc.display_order, joc.chip_label
-    `);
-    const { results: chipsResults } = await chipsStmt.bind(jobId, true).all();
-
-    // Find best matching AI snapshot
-    const aiSnapshot = await findBestAISnapshot(env, {
-      title: job.title,
-      city: job.location ? JSON.parse(job.location)[0] : null,
-      country: job.location ? JSON.parse(job.location)[0] : null, // Simplified for now
-      employment_type: job.employment_type,
+    const childJobs = childJobsResults.map((childJob) => {
+      return {
+        ...childJob,
+        ageHours: Math.floor(
+          (Date.now() - new Date(childJob.created_at)) / 1000 / 60 / 60,
+        ),
+      };
     });
 
-    // Format job data
-    const {
-      company_logo_url,
-      company_color,
-      company_name,
-      company_description,
-      company_id,
-      ...jobItem
-    } = job;
-
-    const formattedJob = {
-      ...jobItem,
-      location: job.location ? JSON.parse(job.location) : [],
-      company: {
-        id: company_id,
-        name: company_name,
-        logo_url: company_logo_url,
-        color: company_color,
-        description: company_description,
-      },
-    };
-
-    // Format child jobs for Live Listings section
-    const childJobs = childJobsResults.map((child) => ({
-      id: child.id,
-      title: child.title,
-      source: child.source,
-      url: child.link,
-      city: child.city,
-      country: child.country,
-      ageHours: Math.floor(
-        (Date.now() - new Date(child.created_at)) / (1000 * 60 * 60),
-      ),
-    }));
-
-    // Format chips for What Can You Offer section
-    const offerChips = chipsResults.reduce((acc, chip) => {
-      acc[chip.chip_key] = chip.chip_label;
-      return acc;
-    }, {});
+    // Get AI snapshot
+    const aiSnapshotStmt = env.DB.prepare(`
+      SELECT * FROM ai_snapshots WHERE parent_job_id = ?
+    `);
+    const aiSnapshot = await aiSnapshotStmt.bind(jobId).first();
 
     return createResponse({
       success: true,
       data: {
-        job: formattedJob,
-        childJobs: childJobs,
-        offerChips: offerChips,
-        aiSnapshot: aiSnapshot,
+        job: { ...job, location: job.location ? JSON.parse(job.location) : [] },
+        company,
+        childJobs,
+        aiSnapshot: {
+          ...aiSnapshot,
+          market_insights: aiSnapshot.market_insights
+            ? JSON.parse(aiSnapshot.market_insights)
+            : null,
+          salary_range: aiSnapshot.salary_range
+            ? JSON.parse(aiSnapshot.salary_range)
+            : null,
+          required_skills: aiSnapshot.required_skills
+            ? JSON.parse(aiSnapshot.required_skills)
+            : null,
+        },
       },
     });
   } catch (error) {
