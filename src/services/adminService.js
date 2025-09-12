@@ -410,6 +410,14 @@ export const adminService = {
       return await api.get(url);
     },
 
+    getById: async (id) => {
+      return await api.get(`/admin/users/${id}`);
+    },
+
+    create: async (data) => {
+      return await api.post("/admin/users", data);
+    },
+
     update: async (id, data) => {
       return await api.put(`/admin/users/${id}`, data);
     },

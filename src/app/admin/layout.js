@@ -41,6 +41,12 @@ export default function AdminLayout({ children }) {
       roles: ["super_admin", "company_admin"],
     },
     {
+      name: "Users",
+      href: "/admin/users",
+      icon: "👥",
+      roles: ["super_admin", "company_admin"],
+    },
+    {
       name: "Companies",
       href: "/admin/companies",
       icon: "🏢",
@@ -59,6 +65,12 @@ export default function AdminLayout({ children }) {
       roles: ["super_admin", "company_admin"],
     },
     {
+      name: "Contacts",
+      href: "/admin/contacts",
+      icon: "📞",
+      roles: ["super_admin", "company_admin"],
+    },
+    {
       name: "AI Snapshots",
       href: "/admin/ai-snapshots",
       icon: "🤖",
@@ -70,18 +82,6 @@ export default function AdminLayout({ children }) {
       icon: "🏷️",
       roles: ["super_admin", "company_admin"],
     },
-    {
-      name: "Contacts",
-      href: "/admin/contacts",
-      icon: "📞",
-      roles: ["super_admin", "company_admin"],
-    },
-    // {
-    //   name: 'Users',
-    //   href: '/admin/users',
-    //   icon: '👥',
-    //   roles: ['super_admin']
-    // }
   ];
 
   const filteredNavItems = navigationItems.filter((item) =>

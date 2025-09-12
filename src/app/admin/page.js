@@ -305,6 +305,26 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </Link>
+            <Link
+              href="/admin/users"
+              className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:shadow-sm transition-all duration-150 group"
+            >
+              <div className="flex items-center">
+                <div className="p-2 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors">
+                  <span className="text-xl">👥</span>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-gray-900">
+                    Manage Users
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {user.role === "super_admin"
+                      ? "Add and manage all users"
+                      : "Manage company users"}
+                  </p>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
       </div>

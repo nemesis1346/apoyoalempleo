@@ -295,13 +295,13 @@ const ApplyNowModal = ({ isOpen, onClose, job, company, selectedContact }) => {
             console.log("Close button clicked"); // Debug log
             onClose();
           }}
-          className="absolute right-4 top-4 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200 text-gray-500 hover:text-gray-700 text-2xl transition-all duration-200 cursor-pointer"
+          className="absolute w-10 h-10 flex items-center justify-center rounded-full active:bg-gray-200 text-gray-500 hover:text-gray-700 text-2xl transition-all duration-200 cursor-pointer"
           aria-label="Close modal"
           style={{
             zIndex: 9999,
             position: "absolute",
-            top: "16px",
-            right: "16px",
+            top: "30px",
+            right: "15px",
           }}
         >
           ×
@@ -454,7 +454,7 @@ const ApplyNowModal = ({ isOpen, onClose, job, company, selectedContact }) => {
                   🎯 Unlock now and get:
                 </h4>
 
-                <div className="space-y-3 mb-4">
+                <div className="space-y-2 mb-4">
                   {[
                     { icon: "🔓", text: "Unlock 1 verified contact" },
                     { icon: "📬", text: "Direct contact with recruiter" },
@@ -466,7 +466,7 @@ const ApplyNowModal = ({ isOpen, onClose, job, company, selectedContact }) => {
                   ].map((benefit, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-3 p-3 bg-white/50 border border-gray-200 rounded-xl transform transition-all duration-300 benefit-line"
+                      className="flex items-center gap-2 p-2 bg-white/50 border border-gray-200 rounded-xl transform transition-all duration-300 benefit-line"
                       style={{
                         transitionDelay: `${index * 80}ms`,
                         opacity: 0,
@@ -484,7 +484,7 @@ const ApplyNowModal = ({ isOpen, onClose, job, company, selectedContact }) => {
                 </div>
 
                 <div className="border-t border-gray-200 pt-4">
-                  <div className="bg-white border border-gray-200 rounded-xl p-4 text-center mb-4">
+                  <div className="bg-white border border-gray-200 rounded-xl p-2 text-center mb-4">
                     <p className="font-bold text-gray-800 leading-relaxed">
                       It's not magic. It's direct contact.
                       <br />
@@ -497,7 +497,7 @@ const ApplyNowModal = ({ isOpen, onClose, job, company, selectedContact }) => {
                   <div className="space-y-2">
                     <button
                       onClick={() => goToStep(2)}
-                      className="w-full font-black py-4 px-6 rounded-xl text-white shadow-lg transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden shimmer-btn"
+                      className="w-full font-black py-2 px-6 rounded-xl text-white shadow-lg transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden shimmer-btn"
                       style={{
                         background: `linear-gradient(180deg, rgba(255,255,255,0.3), var(--brand))`,
                         backgroundColor: companyColor,
@@ -512,7 +512,7 @@ const ApplyNowModal = ({ isOpen, onClose, job, company, selectedContact }) => {
                         vibrate(5);
                         onClose();
                       }}
-                      className="w-full bg-white border-2 border-gray-300 text-gray-700 font-bold py-4 px-6 rounded-xl hover:bg-gray-50 transition-all duration-200 hover:scale-[0.98]"
+                      className="w-full bg-white border-2 border-gray-300 text-gray-700 font-bold py-2 px-6 rounded-xl hover:bg-gray-50 transition-all duration-200 hover:scale-[0.98]"
                     >
                       ❌ No, I prefer to be ignored on job boards
                     </button>

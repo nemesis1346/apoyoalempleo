@@ -6,6 +6,7 @@ import { handleContactsRequest } from "./contacts.js";
 import { handleChildJobsRequest } from "./child-jobs.js";
 import { handleAISnapshotsRequest } from "./ai-snapshots.js";
 import { handleChipsRequest } from "./chips.js";
+import { handleUsersRequest } from "./users.js";
 
 export async function handleAdminRequest(request, env) {
   const url = new URL(request.url);
@@ -86,6 +87,15 @@ export async function handleAdminRequest(request, env) {
           user,
         );
         break;
+      case "users":
+        response = await handleUsersRequest(
+          method,
+          resourceId,
+          request,
+          env,
+          user,
+        );
+        break;
       case "stats":
         response = await handleStats(method, request, env, user);
         break;
@@ -96,6 +106,7 @@ export async function handleAdminRequest(request, env) {
     // Ensure CORS headers are present on all admin responses
     return addCorsHeaders(response);
   } catch (error) {
+    console.error("Admin request error:", error);
     return createResponse({ error: "Internal server error" }, 500);
   }
 }
